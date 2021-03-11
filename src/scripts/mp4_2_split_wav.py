@@ -47,18 +47,22 @@ if __name__ == '__main__':
     json_text = json_file.read()
     json_dic = json.loads(json_text)
     segs = json_dic['segments']
+    
     audio_pathOut = pathOut+'{}'.format(filename)
     
+    # audio file별 pathOut folder 없는 경우 생성
+    if not os.path.exists(audio_pathOut):
+        os.makedirs(audio_pathOut)
+    else:
+        print(audio_pathOut + " has been processed!")
+    
+    # audio 파일, text 정보를 담은 csv 파일 생성
     with open('{}/{}_splitted.csv'.format(audio_pathOut, filename), 
-              'w', newline='') as c:
+              'w', newline='', encoding='utf-8-sig') as c:
         wr = csv.writer(c)
         wr.writerow(['Index', 'File_name', 'Start', 'End', 'Text'])
-        
-        if not os.path.exists(audio_pathOut):
-            os.makedirs(audio_pathOut)
-        else:
-            print(audio_pathOut + " has been processed!")
-
+ 
+        # segments별로 audio 파일 추출
         for seg in segs:
             ind += 1
             start = seg['start'] / 1000
