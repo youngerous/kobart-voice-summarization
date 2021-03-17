@@ -8,19 +8,54 @@ TBD
 
 
 ## Code Structure
-
+```sh
+src/kobart/
+    ├─ data/
+      └─ cached/ # tokenized indice with no special tokens
+          ├─ cached_train.jsonl
+          ├─ cached_dev.jsonl
+          └─ cached_test.jsonl
+      ├─ train.jsonl # raw data with many meta-data
+      ├─ dev.jsonl
+      ├─ test.jsonl
+      ├─ processed_train.jsonl # only src, tgt text
+      ├─ processed_dev.jsonl
+      └─ processed_test.jsonl
+    ├─ config.py
+    ├─ dataset.py
+    ├─ main.py
+    ├─ preprocess.py
+    ├─ trainer.py
+    └─ utils.py
 ```
-repo
-  ├─ img/
-  ├─ src/
-  ├─ .gitignore
-  ├─ Dockerfile
-  ├─ LICENSE
-  ├─ README.md
-  └─ requirements.txt
+
+## How to Preprocess
+```train.jsonl``` / ```dev.jsonl``` / ```test.jsonl```은 미리 다운로드받아 위 구조에 맞게 배치해야 합니다. <br>
+```src/kobart/``` 경로에서 아래 명령어를 실행하면 됩니다.
+
+```sh
+# train 
+$ python preprocess.py --mode train
+
+# dev 
+$ python preprocess.py --mode dev
+
+# test 
+$ python preprocess.py --mode test
+```
+
+## How to Run
+```sh
+# 
+$ python
 ```
 
 ## Results
+
+### Video
+- [제안발표영상]()
+- [중간발표영상]()
+- [최종발표영상]()
 
 ### Demo
 TBD
