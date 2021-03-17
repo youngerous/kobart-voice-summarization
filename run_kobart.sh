@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BATCH_SIZE=16
+BATCH_SIZE=8
 EPOCH=5
 
 

@@ -18,14 +18,7 @@ from utils import AverageMeter, reduce_mean
 
 
 class Trainer:
-    def __init__(
-        self,
-        hparams,
-        loaders,
-        model,
-        resultwriter,
-        ngpus_per_node: int = None,
-    ):
+    def __init__(self, hparams, loaders, model, resultwriter):
         self.hparams = hparams
         self.rank = self.hparams.rank
         self.nprocs = torch.cuda.device_count()
