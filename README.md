@@ -10,7 +10,7 @@ TBD
 ## Code Structure
 ```sh
 src/kobart/
-    ├─ data/
+    └─ data/
       └─ cached/ # tokenized indice with no special tokens
           ├─ cached_train.jsonl
           ├─ cached_dev.jsonl
@@ -46,8 +46,8 @@ $ python preprocess.py --mode test
 
 ## How to Run
 ```sh
-# 
-$ python
+# root 경로에서 실행하면 됩니다.
+$ sh run_kobart.sh
 ```
 
 ## Results
