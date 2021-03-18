@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BATCH_SIZE=10
+BATCH_SIZE=8
 EPOCH=5
 LR=3e-5
 
@@ -9,4 +9,4 @@ python src/kobart/main.py\
     --lr=${LR}\
     --epoch=${EPOCH}\
     --distributed\
-
+    --amp\

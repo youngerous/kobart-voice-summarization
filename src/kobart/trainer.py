@@ -23,6 +23,7 @@ class Trainer:
         self.hparams = hparams
         self.rank = self.hparams.rank
         self.nprocs = torch.cuda.device_count()
+        self.scaler = torch.cuda.amp.GradScaler() if self.hparams.amp else None
         if self.hparams.distributed:
             assert torch.cuda.is_available()
             self.device = f"cuda:{self.rank}"
@@ -171,14 +172,22 @@ class Trainer:
             labels = labels.to(self.device, non_blocking=True)
 
             # compute loss
-            output = self.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                decoder_input_ids=dec_input_ids,
-                decoder_attention_mask=dec_attention_mask,
-                labels=labels,
-            )
-            loss = output.loss
+            self.optimizer.zero_grad()
+            if self.hparams.amp:
+                with torch.cuda.amp.autocast():
+                    output = self.model(
+                        input_ids=input_ids,
+                        attention_mask=attention_mask,
+                        labels=labels,
+                    )
+                    loss = output.loss
+            else:
+                output = self.model(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    labels=labels,
+                )
+                loss = output.loss
 
             # reduce and update
             if self.hparams.distributed:
