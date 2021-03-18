@@ -15,17 +15,23 @@ class SummaryDataset(Dataset):
 
     :param root_path: Root path of dataset
     :param mode: Choose 'train', 'dev', or 'test'
+    :param tok: Kobart tokenizer to use
     :param max_len: Maximum length of BART input
     :param ignore_index: Default ignore index calculating cross entropy loss
     """
 
     def __init__(
-        self, root_path: str, mode: str, max_len: int = 512, ignore_index=-100
+        self,
+        root_path: str,
+        mode: str,
+        tok,
+        max_len: int = 512,
+        ignore_index: int = -100,
     ):
         super(SummaryDataset, self).__init__()
         assert mode in ["train", "dev", "test"]
 
-        self.tokenizer = get_kobart_tokenizer()
+        self.tokenizer = tok
         self.max_len = max_len
         self.eos_idx = self.tokenizer.vocab["</s>"]
         self.pad_idx = self.tokenizer.vocab["<pad>"]
@@ -40,18 +46,18 @@ class SummaryDataset(Dataset):
             self.dset.append(json.loads(json_str))
         print(f"Load {len(self.dset)} {mode} sample.")
 
-    def add_eos_pad(self, indice: List[int]) -> List[int]:
-        diff = self.max_len - len(indice) - 1
+    def add_pad(self, indice: List[int]) -> List[int]:
+        diff = self.max_len - len(indice)
         if diff > 0:
-            indice += [self.eos_idx] + [self.pad_idx] * diff
+            indice += [self.pad_idx] * diff
         else:
             indice = indice[: self.max_len - 1] + [self.eos_idx]
         return indice
 
     def add_ignore_idx(self, indice: List[int]) -> List[int]:
-        diff = self.max_len - len(indice) - 1
+        diff = self.max_len - len(indice)
         if diff > 0:
-            indice += [self.eos_idx] + [self.ign_idx] * diff
+            indice += [self.ign_idx] * diff
         else:
             indice = indice[: self.max_len - 1] + [self.eos_idx]
         return indice
@@ -60,46 +66,50 @@ class SummaryDataset(Dataset):
         return len(self.dset)
 
     def __getitem__(self, idx: int) -> dict:
-        """
-        For translation and summarization training, decoder_input_ids should be provided.
-        If no decoder_input_ids is provided,
-            the model will create this tensor by shifting the input_ids to the right
-            for denoising pre-training following the paper.
-        """
         # load tokenized indice
         src = self.dset[idx]["src"]
         tgt = self.dset[idx]["tgt"]
+        src.append(self.eos_idx)
+        tgt.append(self.eos_idx)
 
-        # add </s> and <pad> token
-        padded_src = torch.tensor(self.add_eos_pad(src))
+        # add <pad> token to src
+        padded_src = torch.tensor(self.add_pad(src))
+
+        # decoder input
+        dec_input_ids = [self.pad_idx]
+        dec_input_ids += tgt[:-1]
+        dec_input_ids = torch.tensor(self.add_pad(dec_input_ids))
+
+        # add ignore token to tgt (default -100 for CrossEntropy loss)
         padded_tgt = torch.tensor(self.add_ignore_idx(tgt))
-
-        attention_mask = padded_src.ne(self.pad_idx).float()
 
         assert len(padded_src) == self.max_len
         assert len(padded_tgt) == self.max_len
-        assert len(attention_mask) == self.max_len
+        assert len(dec_input_ids) == self.max_len
 
         return {
             "input_ids": padded_src,
-            "attention_mask": attention_mask,
+            "decoder_input_ids": dec_input_ids,
             "labels": padded_tgt,
         }
 
 
 def get_loader(
-    batch_size: int, path: str, workers: int, mode: str, distributed: bool = False
+    tok, batch_size: int, path: str, workers: int, mode: str, distributed: bool = False
 ) -> DataLoader:
     """
+    :param tok: Kobart tokenizer to use
     :param batch_size: Mini-batch size
     :param path: Root path of dataset
     :param workers: Number of dataloader workers
     :param mode: Choose 'train', 'dev', or 'test'
     :param distributed: Whether to use ddp
+
+    :return: dataloader
     """
     assert mode in ["train", "dev", "test"]
 
-    dset = SummaryDataset(root_path=path, mode=mode)
+    dset = SummaryDataset(root_path=path, mode=mode, tok=tok)
     shuffle_flag = mode == "train"
     sampler = None
     if distributed:
