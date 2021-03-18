@@ -145,7 +145,6 @@ class Trainer:
             if self.hparams.distributed:
                 self.train_sampler.set_epoch(epoch)
 
-            self.scheduler.step()
             self._train_epoch(epoch)
 
         if self.rank in [-1, 0]:
@@ -191,6 +190,7 @@ class Trainer:
                 loss = reduce_mean(loss, self.nprocs)
             loss.backward()
             self.optimizer.step()
+            self.scheduler.step()
             train_loss.update(loss.item())
 
             # validate and logging
