@@ -135,10 +135,6 @@ class Trainer:
         self.global_val_loss = val_loss
 
     def fit(self) -> dict:
-        # this zero gradient update is needed to avoid a warning message when using warmup.
-        self.optimizer.zero_grad()
-        self.optimizer.step()
-
         for epoch in tqdm(
             range(self.hparams.epoch), desc="epoch", disable=self.rank not in [-1, 0]
         ):
