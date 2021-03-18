@@ -1,3 +1,4 @@
+src/kobart/results.csv
 src/kobart/data/
 src/kobart/checkpoints/
 src/kobart/__pycache__
