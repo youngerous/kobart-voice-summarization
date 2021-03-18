@@ -12,13 +12,14 @@ import yaml
 from tensorboardX import SummaryWriter
 from torch.nn.parallel import DistributedDataParallel as DDP
 from tqdm import tqdm
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import AdamW, get_cosine_schedule_with_warmup
+
 
 from utils import AverageMeter, reduce_mean
 
 
 class Trainer:
-    def __init__(self, hparams, loaders, model, resultwriter):
+    def __init__(self, hparams, tokenizer, loaders, model, resultwriter):
         self.hparams = hparams
         self.rank = self.hparams.rank
         self.nprocs = torch.cuda.device_count()
@@ -32,10 +33,9 @@ class Trainer:
         self.model = model.to(self.device, non_blocking=True)
         if self.hparams.distributed:
             self.model = DDP(self.model, device_ids=[self.rank])
-        self.scaler = torch.cuda.amp.GradScaler() if self.hparams.amp else None
 
-        # metric
-        self.criterion = nn.CrossEntropyLoss()
+        self.tokenizer = tokenizer
+        self.pad_idx = self.tokenizer.vocab["<pad>"]
 
         # dataloader and distributed sampler
         self.train_loader, self.valid_loader, self.test_loader = loaders
@@ -68,7 +68,7 @@ class Trainer:
                     hparams, outfile, default_flow_style=False, allow_unicode=True
                 )
 
-            # experiment-logging options
+            # experiment logging options
             self.best_result = {"version": self.version}
 
     def configure_optimizers(self):
@@ -96,7 +96,7 @@ class Trainer:
         # lr warmup scheduler
         self.step_total = len(self.train_loader) * self.hparams.epoch
         warmup_steps = math.ceil(self.step_total * self.hparams.warmup_ratio)
-        scheduler = get_linear_schedule_with_warmup(
+        scheduler = get_cosine_schedule_with_warmup(
             optimizer, num_warmup_steps=warmup_steps, num_training_steps=self.step_total
         )
 
@@ -145,10 +145,7 @@ class Trainer:
             if self.hparams.distributed:
                 self.train_sampler.set_epoch(epoch)
 
-            if self.rank in [-1, 0]:
-                tqdm.write(
-                    f"* Learning Rate: {self.optimizer.param_groups[0]['lr']:.5f}"
-                )
+            self.scheduler.step()
             self._train_epoch(epoch)
 
         if self.rank in [-1, 0]:
@@ -166,56 +163,43 @@ class Trainer:
             disable=self.rank not in [-1, 0],
         ):
             input_ids = batch["input_ids"]
-            attention_mask = batch["attention_mask"]
+            attention_mask = input_ids.ne(self.pad_idx).float()
+            dec_input_ids = batch["decoder_input_ids"]
+            dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
             labels = batch["labels"]
-            input_ids, attention_mask, labels = map(
-                lambda x: x.to(self.device, non_blocking=True),
-                (input_ids, attention_mask, labels),
-            )
+
+            # load to machine
+            input_ids = input_ids.to(self.device, non_blocking=True)
+            attention_mask = attention_mask.to(self.device, non_blocking=True)
+            dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
+            dec_attention_mask = dec_attention_mask.to(self.device, non_blocking=True)
+            labels = labels.to(self.device, non_blocking=True)
 
             # compute loss
-            if self.hparams.amp:
-                with torch.cuda.amp.autocast():
-                    output = self.model(
-                        input_ids=input_ids,
-                        attention_mask=attention_mask,
-                        labels=labels,
-                    )
-                    loss = output.loss
-            else:
-                output = self.model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask,
-                    labels=labels,
-                )
-                loss = output.loss
+            output = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=dec_input_ids,
+                decoder_attention_mask=dec_attention_mask,
+                labels=labels,
+            )
+            loss = output.loss
 
             # reduce and update
             if self.hparams.distributed:
                 dist.barrier()
                 loss = reduce_mean(loss, self.nprocs)
-
-            if self.hparams.amp:
-                self.scaler.scale(loss).backward()
-                self.scaler.step(self.optimizer)
-                self.scheduler.step()
-                self.scaler.update()
-            else:
-                loss.backward()
-                self.optimizer.step()
-                self.scheduler.step()
-
+            loss.backward()
+            self.optimizer.step()
             train_loss.update(loss.item())
 
-            # validate
+            # validate and logging
             self.global_step += 1
             if self.global_step % self.eval_step == 0:
                 val_loss = self.validate(epoch)
                 if self.rank in [-1, 0]:
                     self.summarywriter.add_scalars(
-                        "loss/step",
-                        {"val": val_loss, "train": train_loss.avg},
-                        self.global_step,
+                        "loss/step", {"val": val_loss}, self.global_step
                     )
                     if val_loss < self.global_val_loss:
                         self.save_checkpoint(epoch, val_loss, self.model)
@@ -223,16 +207,20 @@ class Trainer:
                         f"** global step: {self.global_step}, val loss: {val_loss:.3f}"
                     )
 
+            # train logging
             if self.rank in [-1, 0]:
                 if self.global_step % self.log_step == 0:
                     tqdm.write(
-                        f"[DDP Version {self.version} Epoch {epoch}] global step: {self.global_step}, train loss: {loss.item():.3f}"
+                        f"[Ver.{self.version} EPOCH {epoch}] global step: {self.global_step}, train loss: {loss.item():.3f}, lr: {self.optimizer.param_groups[0]['lr']:.5f}"
                     )
-                self.summarywriter.add_scalars(
-                    "lr", {"lr": self.optimizer.param_groups[0]["lr"]}, self.global_step
-                )
-
-        train_loss = train_loss.avg
+                    self.summarywriter.add_scalars(
+                        "loss/step", {"train": train_loss.avg}, self.global_step
+                    )
+                    self.summarywriter.add_scalars(
+                        "lr",
+                        {"lr": self.optimizer.param_groups[0]["lr"]},
+                        self.global_step,
+                    )
 
     def validate(self, epoch: int) -> float:
         val_loss = AverageMeter()
@@ -246,20 +234,31 @@ class Trainer:
                 disable=self.rank not in [-1, 0],
             ):
                 input_ids = batch["input_ids"]
-                attention_mask = batch["attention_mask"]
+                attention_mask = input_ids.ne(self.pad_idx).float()
+                dec_input_ids = batch["decoder_input_ids"]
+                dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
                 labels = batch["labels"]
-                input_ids, attention_mask, labels = map(
-                    lambda x: x.to(self.device, non_blocking=True),
-                    (input_ids, attention_mask, labels),
-                )
 
+                # load to machine
+                input_ids = input_ids.to(self.device, non_blocking=True)
+                attention_mask = attention_mask.to(self.device, non_blocking=True)
+                dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
+                dec_attention_mask = dec_attention_mask.to(
+                    self.device, non_blocking=True
+                )
+                labels = labels.to(self.device, non_blocking=True)
+
+                # compute loss
                 output = self.model(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
+                    decoder_input_ids=dec_input_ids,
+                    decoder_attention_mask=dec_attention_mask,
                     labels=labels,
                 )
                 loss = output.loss
 
+                # reduce
                 if self.hparams.distributed:
                     dist.barrier()
                     loss = reduce_mean(loss, self.nprocs)
@@ -279,20 +278,29 @@ class Trainer:
                 total=len(self.test_loader),
             ):
                 input_ids = batch["input_ids"]
-                attention_mask = batch["attention_mask"]
+                attention_mask = input_ids.ne(self.pad_idx).float()
+                dec_input_ids = batch["decoder_input_ids"]
+                dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
                 labels = batch["labels"]
-                input_ids, attention_mask, labels = map(
-                    lambda x: x.to(self.device, non_blocking=True),
-                    (input_ids, attention_mask, labels),
-                )
 
+                # load to machine
+                input_ids = input_ids.to(self.device, non_blocking=True)
+                attention_mask = attention_mask.to(self.device, non_blocking=True)
+                dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
+                dec_attention_mask = dec_attention_mask.to(
+                    self.device, non_blocking=True
+                )
+                labels = labels.to(self.device, non_blocking=True)
+
+                # compute loss
                 output = self.model(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
+                    decoder_input_ids=dec_input_ids,
+                    decoder_attention_mask=dec_attention_mask,
                     labels=labels,
                 )
                 loss = output.loss
-
                 test_loss.update(loss.item())
 
         print()

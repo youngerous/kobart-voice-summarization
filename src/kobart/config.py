@@ -11,10 +11,7 @@ def load_config():
     parser.add_argument("--seed", type=int, default=42, help="Seed for reproducibility")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--log-step", type=int, default=200)
-    parser.add_argument("--eval-ratio", type=float, default=0.1)
-    parser.add_argument(
-        "--amp", action="store_true", default=False, help="PyTorch(>=1.6.x) AMP"
-    )
+    parser.add_argument("--eval-ratio", type=float, default=0.05)
     parser.add_argument(
         "--distributed", action="store_true", default=False, help="Whether to use ddp"
     )
@@ -30,9 +27,9 @@ def load_config():
     )
 
     # training hparams
-    parser.add_argument("--epoch", type=int, default=10)
-    parser.add_argument("--batch-size", type=int, default=16)
-    parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--epoch", type=int, default=5)
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight-decay", type=float, default=0.01)
     parser.add_argument("--warmup-ratio", type=float, default=0.1)
 
