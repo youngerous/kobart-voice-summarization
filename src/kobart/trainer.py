@@ -143,7 +143,6 @@ class Trainer:
                 self.train_sampler.set_epoch(epoch)
 
             self._train_epoch(epoch)
-            self.scheduler.step()
 
         if self.rank in [-1, 0]:
             self.summarywriter.close()
@@ -198,10 +197,12 @@ class Trainer:
             if self.hparams.amp:
                 self.scaler.scale(loss).backward()
                 self.scaler.step(self.optimizer)
+                self.scheduler.step()
                 self.scaler.update()
             else:
                 loss.backward()
                 self.optimizer.step()
+                self.scheduler.step()
 
             train_loss.update(loss.item())
 
