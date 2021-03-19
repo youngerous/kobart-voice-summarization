@@ -143,6 +143,7 @@ class Trainer:
                 self.train_sampler.set_epoch(epoch)
 
             self._train_epoch(epoch)
+            self.scheduler.step()
 
         if self.rank in [-1, 0]:
             self.summarywriter.close()
@@ -193,9 +194,15 @@ class Trainer:
             if self.hparams.distributed:
                 dist.barrier()
                 loss = reduce_mean(loss, self.nprocs)
-            loss.backward()
-            self.optimizer.step()
-            self.scheduler.step()
+
+            if self.hparams.amp:
+                self.scaler.scale(loss).backward()
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+            else:
+                loss.backward()
+                self.optimizer.step()
+
             train_loss.update(loss.item())
 
             # validate and logging
