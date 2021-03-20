@@ -222,11 +222,11 @@ class Trainer:
                     self.summarywriter.add_scalars(
                         "loss/step", {"val": val_loss}, self.global_step
                     )
-                    if val_loss < self.global_val_loss:
-                        self.save_checkpoint(epoch, val_loss, self.model)
                     logging.info(
                         f"[VAL] global step: {self.global_step} | val loss: {val_loss:.3f}"
                     )
+                    if val_loss < self.global_val_loss:
+                        self.save_checkpoint(epoch, val_loss, self.model)
 
             # train logging
             if self.rank in [-1, 0]:
