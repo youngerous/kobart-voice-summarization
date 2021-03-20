@@ -1,4 +1,5 @@
 import glob
+import logging
 import math
 import os
 import random
@@ -62,6 +63,11 @@ class Trainer:
             self.summarywriter = SummaryWriter(self.save_path)
             self.global_val_loss = float("inf")
             self.log_step = hparams.log_step
+            logging.basicConfig(
+                filename=os.path.join(self.save_path, "experiment.log"),
+                level=logging.INFO,
+                format="%(asctime)s > %(message)s",
+            )
             with open(
                 os.path.join(self.save_path, "hparams.yaml"), "w", encoding="utf8"
             ) as outfile:
@@ -71,6 +77,10 @@ class Trainer:
 
             # experiment logging options
             self.best_result = {"version": self.version}
+
+            logging.info(
+                f"[SCHEDULER] Total_step: {self.step_total} | Warmup step: {self.warmup_steps}"
+            )
 
     def configure_optimizers(self):
         # optimizer
@@ -96,15 +106,13 @@ class Trainer:
 
         # lr warmup scheduler
         self.step_total = len(self.train_loader) * self.hparams.epoch
-        warmup_steps = math.ceil(self.step_total * self.hparams.warmup_ratio)
+        self.warmup_steps = math.ceil(self.step_total * self.hparams.warmup_ratio)
         scheduler = get_cosine_schedule_with_warmup(
-            optimizer, num_warmup_steps=warmup_steps, num_training_steps=self.step_total
+            optimizer,
+            num_warmup_steps=self.warmup_steps,
+            num_training_steps=self.step_total,
         )
 
-        if self.rank in [-1, 0]:
-            print(
-                f"[SCHEDULER] total_step: {self.step_total}, warmup step: {warmup_steps}"
-            )
         return optimizer, scheduler
 
     def get_parameter_names(self, model, forbidden_layer_types):
@@ -123,8 +131,8 @@ class Trainer:
         return result
 
     def save_checkpoint(self, epoch: int, val_loss: float, model: nn.Module) -> None:
-        tqdm.write(
-            f"Val loss decreased ({self.global_val_loss:.4f} → {val_loss:.4f}). Saving model ..."
+        logging.info(
+            f"      Val loss decreased ({self.global_val_loss:.4f} → {val_loss:.4f}). Saving model ..."
         )
         new_path = os.path.join(
             self.save_path, f"best_model_step_{self.global_step}_loss_{val_loss:.4f}.pt"
@@ -216,15 +224,15 @@ class Trainer:
                     )
                     if val_loss < self.global_val_loss:
                         self.save_checkpoint(epoch, val_loss, self.model)
-                    tqdm.write(
-                        f"** global step: {self.global_step}, val loss: {val_loss:.3f}"
+                    logging.info(
+                        f"[VAL] global step: {self.global_step} | val loss: {val_loss:.3f}"
                     )
 
             # train logging
             if self.rank in [-1, 0]:
                 if self.global_step % self.log_step == 0:
-                    tqdm.write(
-                        f"[Ver.{self.version} EPOCH {epoch}] global step: {self.global_step}, train loss: {loss.item():.3f}, lr: {self.optimizer.param_groups[0]['lr']:.5f}"
+                    logging.info(
+                        f"[TRN] Version: {self.version} | Epoch: {epoch} | Global step: {self.global_step} | Train loss: {loss.item():.3f} | LR: {self.optimizer.param_groups[0]['lr']:.5f}"
                     )
                     self.summarywriter.add_scalars(
                         "loss/step", {"train": train_loss.avg}, self.global_step
@@ -316,8 +324,6 @@ class Trainer:
                 loss = output.loss
                 test_loss.update(loss.item())
 
-        print()
-        print(f"** Test Loss: {test_loss.avg:.4f}")
-        print()
+        logging.info(f"[TST] Test Loss: {test_loss.avg:.4f}")
 
         return {"test_loss": test_loss.avg}
