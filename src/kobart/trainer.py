@@ -62,12 +62,6 @@ class Trainer:
                     self.version += 1
             self.summarywriter = SummaryWriter(self.save_path)
             self.global_val_loss = float("inf")
-            self.log_step = hparams.log_step
-            logging.basicConfig(
-                filename=os.path.join(self.save_path, "experiment.log"),
-                level=logging.INFO,
-                format="%(asctime)s > %(message)s",
-            )
             with open(
                 os.path.join(self.save_path, "hparams.yaml"), "w", encoding="utf8"
             ) as outfile:
@@ -77,7 +71,12 @@ class Trainer:
 
             # experiment logging options
             self.best_result = {"version": self.version}
-
+            self.log_step = hparams.log_step
+            logging.basicConfig(
+                filename=os.path.join(self.save_path, "experiment.log"),
+                level=logging.INFO,
+                format="%(asctime)s > %(message)s",
+            )
             logging.info(
                 f"[SCHEDULER] Total_step: {self.step_total} | Warmup step: {self.warmup_steps}"
             )

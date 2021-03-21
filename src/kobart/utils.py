@@ -8,8 +8,6 @@ import pandas as pd
 import torch
 import torch.distributed as dist
 from torch.utils.data import Sampler
-from torch.optim.lr_scheduler import _LRScheduler
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 def reduce_mean(tensor: torch.Tensor, nprocs: int) -> torch.Tensor:
