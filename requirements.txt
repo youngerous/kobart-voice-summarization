@@ -1,0 +1,9 @@
+jsonlines==2.0.0
+tensorboard==2.4.1
+tensorboardX==2.1
+torch==1.7.1
+tqdm==4.49.0
+transformers==4.3.3
+numpy==1.19.2
+pandas
+pyyaml==5.2.1
