@@ -103,7 +103,7 @@ print(summary)
 
 ### Demo
 
-[결과 및 데모 페이지](https://youngerous.github.io/KoBART-Summary-Demo/)
+[결과 및 데모 페이지](https://youngerous.github.io/kobart-voice-summarization/)
 
 ## 7. Members
 [Hyeongwon Kang](https://github.com/hwk0702), [Subin Kim](https://github.com/suubkiim), [Jina Kim](https://github.com/jina-kim7), [Takyoung Kim](https://github.com/youngerous)
