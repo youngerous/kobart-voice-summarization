@@ -6,9 +6,9 @@ from kobart import get_kobart_tokenizer, get_pytorch_kobart_model
 from transformers import BartForConditionalGeneration
 
 
-def get_summarized_text(text: str) -> str:
+def get_summarized_text(ckpt:str, text: str) -> str:
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    ckpt = "YOUR_CHECKPOINT_PATH"
+    ckpt = ckpt
     state_dict = torch.load(ckpt)
 
     # create new OrderedDict that does not contain `module.`
@@ -33,6 +33,8 @@ def get_summarized_text(text: str) -> str:
 
 
 if __name__ == "__main__":
+    ckpt = "YOUR_CHECKPOINT_PATH"
+
     original_text = """
     코로나19(신종 코로나 바이러스 감염증) 3차 대유행의 확산세가 거세지고 있다. 16일 신규 확진자 수는 또다시 1000명 선을 넘었다. 지난 13일 1030명 이후 사흘만에 1000명대로 올라선 것이다. 지난 1월20일 국내 첫 코로나19 확진자 발생 이후 최다 기록도 경신됐다.
 
@@ -47,5 +49,5 @@ if __name__ == "__main__":
     사망자는 지난 15일보다 12명이 증가해 누적 612명으로 집계됐다. 국내 평균 치명률은 1.35%다. 상태가 악화한 위중증 환자는 지난 15일보다 21명 늘어난 226명이다.
     """
 
-    summary = get_summarized_text(original_text)
+    summary = get_summarized_text(ckpt, original_text)
     print(summary)
