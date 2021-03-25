@@ -8,6 +8,7 @@ from typing import *
 import torch
 import torch.distributed as dist
 import torch.nn as nn
+import torch.nn.utils as torch_utils
 import torch.optim as optim
 import yaml
 from tensorboardX import SummaryWriter
@@ -36,6 +37,7 @@ class Trainer:
         if self.hparams.distributed:
             self.model = DDP(self.model, device_ids=[self.rank])
 
+        self.max_grad_norm = self.hparams.max_grad_norm
         self.tokenizer = tokenizer
         self.pad_idx = self.tokenizer.vocab["<pad>"]
 
@@ -203,11 +205,14 @@ class Trainer:
 
             if self.hparams.amp:
                 self.scaler.scale(loss).backward()
+                self.scaler.unscale_(self.optimizer)
+                torch_utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
                 self.scaler.step(self.optimizer)
                 self.scheduler.step()
                 self.scaler.update()
             else:
                 loss.backward()
+                torch_utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
                 self.optimizer.step()
                 self.scheduler.step()
 
@@ -242,86 +247,82 @@ class Trainer:
                         self.global_step,
                     )
 
+    @torch.no_grad()
     def validate(self, epoch: int) -> float:
         val_loss = AverageMeter()
 
         self.model.eval()
-        with torch.no_grad():
-            for step, batch in tqdm(
-                enumerate(self.valid_loader),
-                desc="valid_steps",
-                total=len(self.valid_loader),
-                disable=self.rank not in [-1, 0],
-            ):
-                input_ids = batch["input_ids"]
-                attention_mask = input_ids.ne(self.pad_idx).float()
-                dec_input_ids = batch["decoder_input_ids"]
-                dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
-                labels = batch["labels"]
+        for step, batch in tqdm(
+            enumerate(self.valid_loader),
+            desc="valid_steps",
+            total=len(self.valid_loader),
+            disable=self.rank not in [-1, 0],
+        ):
+            input_ids = batch["input_ids"]
+            attention_mask = input_ids.ne(self.pad_idx).float()
+            dec_input_ids = batch["decoder_input_ids"]
+            dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
+            labels = batch["labels"]
 
-                # load to machine
-                input_ids = input_ids.to(self.device, non_blocking=True)
-                attention_mask = attention_mask.to(self.device, non_blocking=True)
-                dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
-                dec_attention_mask = dec_attention_mask.to(
-                    self.device, non_blocking=True
-                )
-                labels = labels.to(self.device, non_blocking=True)
+            # load to machine
+            input_ids = input_ids.to(self.device, non_blocking=True)
+            attention_mask = attention_mask.to(self.device, non_blocking=True)
+            dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
+            dec_attention_mask = dec_attention_mask.to(self.device, non_blocking=True)
+            labels = labels.to(self.device, non_blocking=True)
 
-                # compute loss
-                output = self.model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask,
-                    decoder_input_ids=dec_input_ids,
-                    decoder_attention_mask=dec_attention_mask,
-                    labels=labels,
-                )
-                loss = output.loss
+            # compute loss
+            output = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=dec_input_ids,
+                decoder_attention_mask=dec_attention_mask,
+                labels=labels,
+            )
+            loss = output.loss
 
-                # reduce
-                if self.hparams.distributed:
-                    dist.barrier()
-                    loss = reduce_mean(loss, self.nprocs)
-                val_loss.update(loss.item())
+            # reduce
+            if self.hparams.distributed:
+                dist.barrier()
+                loss = reduce_mean(loss, self.nprocs)
+            val_loss.update(loss.item())
 
         return val_loss.avg
 
+    @torch.no_grad()
     def test(self, state_dict) -> dict:
         test_loss = AverageMeter()
 
         self.model.load_state_dict(state_dict)
         self.model.eval()
-        with torch.no_grad():
-            for step, batch in tqdm(
-                enumerate(self.test_loader),
-                desc="tst_steps",
-                total=len(self.test_loader),
-            ):
-                input_ids = batch["input_ids"]
-                attention_mask = input_ids.ne(self.pad_idx).float()
-                dec_input_ids = batch["decoder_input_ids"]
-                dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
-                labels = batch["labels"]
+        for step, batch in tqdm(
+            enumerate(self.test_loader),
+            desc="tst_steps",
+            total=len(self.test_loader),
+        ):
+            input_ids = batch["input_ids"]
+            attention_mask = input_ids.ne(self.pad_idx).float()
+            dec_input_ids = batch["decoder_input_ids"]
+            dec_attention_mask = dec_input_ids.ne(self.pad_idx).float()
+            labels = batch["labels"]
 
-                # load to machine
-                input_ids = input_ids.to(self.device, non_blocking=True)
-                attention_mask = attention_mask.to(self.device, non_blocking=True)
-                dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
-                dec_attention_mask = dec_attention_mask.to(
-                    self.device, non_blocking=True
-                )
-                labels = labels.to(self.device, non_blocking=True)
+            # load to machine
+            input_ids = input_ids.to(self.device, non_blocking=True)
+            attention_mask = attention_mask.to(self.device, non_blocking=True)
+            dec_input_ids = dec_input_ids.to(self.device, non_blocking=True)
+            dec_attention_mask = dec_attention_mask.to(self.device, non_blocking=True)
+            labels = labels.to(self.device, non_blocking=True)
 
-                # compute loss
-                output = self.model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask,
-                    decoder_input_ids=dec_input_ids,
-                    decoder_attention_mask=dec_attention_mask,
-                    labels=labels,
-                )
-                loss = output.loss
-                test_loss.update(loss.item())
+            # compute loss
+            output = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                decoder_input_ids=dec_input_ids,
+                decoder_attention_mask=dec_attention_mask,
+                labels=labels,
+            )
+            loss = output.loss
+            test_loss.update(loss.item())
 
         logging.info(f"[TST] Test Loss: {test_loss.avg:.4f}")
 
