@@ -97,7 +97,7 @@ print(summary)
 ## 6. Results
 
 ### Video
-- [제안발표영상]()
+- [제안발표영상](https://youtu.be/z6T3j-YmY1w)
 - [중간발표영상]()
 - [최종발표영상]()
 
