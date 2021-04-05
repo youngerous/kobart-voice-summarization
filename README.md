@@ -7,7 +7,7 @@
 ## 1. Overview
 TBD
 
-본 repo에서는 KoBART 학습코드를 공개합니다.
+본 repo에서는 KoBART 학습코드(PyTorch)를 공개합니다.
 
 ## 2. Environment
 먼저 아래의 명령어를 사용하여 KoBART를 다운로드합니다.
@@ -22,6 +22,7 @@ pip install git+https://github.com/SKT-AI/KoBART#egg=kobart
 
 ## 3. Code Structure
 ```sh
+# KoBART 문서요약 관련 코드
 src/kobart/
     └─ data/
       └─ cached/ # tokenized indice with no special tokens
@@ -92,7 +93,7 @@ summary = get_summarized_text(ckpt, text)
 print(summary)
 ```
 
-[이곳](https://github.com/youngerous/kobart-voice-summarization/blob/main/src/kobart/4.%20inference_sample.ipynb)에서 몇 개의 예시 데이터를 사용한 결과를 확인하실 수 있습니다.
+[여기](https://github.com/youngerous/kobart-voice-summarization/blob/main/src/kobart/4.%20inference_sample.ipynb)에서 몇 개의 예시 데이터를 사용한 결과를 확인하실 수 있습니다.
 
 ## 6. Results
 
@@ -103,7 +104,7 @@ print(summary)
 
 ### Demo
 
-[결과 및 데모 페이지](https://youngerous.github.io/kobart-voice-summarization/)
+요약 모델의 정량적인 평가와 정성적인 결과물은 [데모 페이지](https://youngerous.github.io/kobart-voice-summarization/)에서 확인하실 수 있습니다.
 
 ## 7. Members
 [Hyeongwon Kang](https://github.com/hwk0702), [Subin Kim](https://github.com/suubkiim), [Jina Kim](https://github.com/jina-kim7), [Takyoung Kim](https://github.com/youngerous)
@@ -116,4 +117,5 @@ print(summary)
 - [[Paper] BART](https://arxiv.org/abs/1910.13461)
 - [[Repo] KoBART :: SKT-AI](https://github.com/SKT-AI/KoBART)
 - [[Repo] KoBART-summarization :: seujung](https://github.com/seujung/KoBART-summarization)
+- [[Repo] PyRouge :: pcyin](https://github.com/pcyin/PyRouge)
 - [[Post] 타코트론2 TTS 시스템 :: joungheekim](https://joungheekim.github.io/2021/04/01/code-review/)
