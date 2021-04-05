@@ -7,19 +7,14 @@
 
 
 ## 1.1. 정량적인 평가
-10000개의 test data로 성능을 측정하였습니다. [PyRouge](https://github.com/pcyin/PyRouge) 라이브러리를 사용하였습니다.
+10000개의 test data로 성능을 측정하였고, [Dacon 한국어 문서 생성요약 AI 경진대회의 metric](https://dacon.io/competitions/official/235673/talkboard/401911?page=1&dtype=recent)을 사용하였습니다.
 
-### ROUGE-2
+|           | Rouge-1 | Rouge-2 | Rouge-L |
+| :-------: | :-----: | :-----: | :-----: |
+| Precision | 0.0000  | 0.0000  | 0.0000  |
+|  Recall   | 0.0000  | 0.0000  | 0.0000  |
+| F1-Score  | 0.0000  | 0.0000  | 0.0000  |
 
-| Precision | Recall | F1-Score |
-| :-------: | :----: | :------: |
-|  0.0000   | 0.0000 |  0.0000  |
-
-### ROUGE-L
-
-| Precision | Recall | F1-Score |
-| :-------: | :----: | :------: |
-|  0.0000   | 0.0000 |  0.0000  |
 
 
 ## 1.2. 정성적인 평가
@@ -31,12 +26,14 @@
 |   1   | Label  |   -   |
 |   1   | KoBART |   -   |
 
+<br/>
 
 |       |        | Text  |
 | :---: | :----: | :---: |
 |   2   | Label  |   -   |
 |   2   | KoBART |   -   |
 
+<br/>
 
 |       |        | Text  |
 | :---: | :----: | :---: |

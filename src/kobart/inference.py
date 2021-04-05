@@ -1,14 +1,17 @@
 import glob
 from collections import OrderedDict
+from pprint import pprint
 
 import torch
 from kobart import get_kobart_tokenizer, get_pytorch_kobart_model
 from transformers import BartForConditionalGeneration
 
+MODEL = BartForConditionalGeneration.from_pretrained(get_pytorch_kobart_model())
+TOK = get_kobart_tokenizer()
+INITIALIZED = False
 
-def get_summarized_text(ckpt:str, text: str) -> str:
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    ckpt = ckpt
+
+def initialize(ckpt: str) -> None:
     state_dict = torch.load(ckpt)
 
     # create new OrderedDict that does not contain `module.`
@@ -17,23 +20,24 @@ def get_summarized_text(ckpt:str, text: str) -> str:
         name = k[7:] if "module." in k else k  # remove `module.`
         new_state_dict[name] = v
 
-    model = BartForConditionalGeneration.from_pretrained(get_pytorch_kobart_model())
-    model.load_state_dict(new_state_dict, strict=True)
+    MODEL.load_state_dict(new_state_dict, strict=True)
+    INITIALIZED = True
 
-    tokenizer = get_kobart_tokenizer()
 
+def get_summarized_text(ckpt: str, text: str) -> str:
+    if not INITIALIZED:
+        initialize(ckpt)
     text = text.replace("\n", "")
-    input_ids = tokenizer.encode(text)
+    input_ids = TOK.encode(text)
     input_ids = torch.tensor(input_ids)
     input_ids = input_ids.unsqueeze(0)
-    output = model.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
-    output = tokenizer.decode(output[0], skip_special_tokens=True)
-
+    output = MODEL.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
+    output = TOK.decode(output[0], skip_special_tokens=True)
     return output
 
 
 if __name__ == "__main__":
-    ckpt = "YOUR_CHECKPOINT_PATH"
+    ckpt = "YOUR_CHECKPOINT"
 
     original_text = """
     코로나19(신종 코로나 바이러스 감염증) 3차 대유행의 확산세가 거세지고 있다. 16일 신규 확진자 수는 또다시 1000명 선을 넘었다. 지난 13일 1030명 이후 사흘만에 1000명대로 올라선 것이다. 지난 1월20일 국내 첫 코로나19 확진자 발생 이후 최다 기록도 경신됐다.
@@ -50,4 +54,4 @@ if __name__ == "__main__":
     """
 
     summary = get_summarized_text(ckpt, original_text)
-    print(summary)
+    pprint(f"요약문: {summary}")
