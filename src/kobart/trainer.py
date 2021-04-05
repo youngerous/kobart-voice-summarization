@@ -23,8 +23,9 @@ from utils import AverageMeter, reduce_mean
 class Trainer:
     def __init__(self, hparams, tokenizer, loaders, model, resultwriter):
         self.hparams = hparams
-        self.rank = self.hparams.rank
-        self.nprocs = torch.cuda.device_count()
+        self.rank: int = self.hparams.rank
+        self.main_process: bool = self.rank in [-1, 0]
+        self.nprocs: int = torch.cuda.device_count()
         self.scaler = torch.cuda.amp.GradScaler() if self.hparams.amp else None
         if self.hparams.distributed:
             assert torch.cuda.is_available()
@@ -51,7 +52,7 @@ class Trainer:
         # model saving options
         self.global_step = 0
         self.eval_step = int(self.step_total * hparams.eval_ratio)
-        if self.rank in [-1, 0]:
+        if self.main_process:
             self.version = 0
             while True:
                 self.save_path = os.path.join(
@@ -146,16 +147,16 @@ class Trainer:
 
     def fit(self) -> dict:
         for epoch in tqdm(
-            range(self.hparams.epoch), desc="epoch", disable=self.rank not in [-1, 0]
+            range(self.hparams.epoch), desc="epoch", disable=not self.main_process
         ):
             if self.hparams.distributed:
                 self.train_sampler.set_epoch(epoch)
 
             self._train_epoch(epoch)
 
-        if self.rank in [-1, 0]:
+        if self.main_process:
             self.summarywriter.close()
-        return self.best_result if self.rank in [-1, 0] else None
+        return self.best_result if self.main_process else None
 
     def _train_epoch(self, epoch: int) -> None:
         train_loss = AverageMeter()
@@ -165,7 +166,7 @@ class Trainer:
             enumerate(self.train_loader),
             desc="train_steps",
             total=len(self.train_loader),
-            disable=self.rank not in [-1, 0],
+            disable=not self.main_process,
         ):
             input_ids = batch["input_ids"]
             attention_mask = input_ids.ne(self.pad_idx).float()
@@ -222,7 +223,7 @@ class Trainer:
             self.global_step += 1
             if self.global_step % self.eval_step == 0:
                 val_loss = self.validate(epoch)
-                if self.rank in [-1, 0]:
+                if self.main_process:
                     self.summarywriter.add_scalars(
                         "loss/step", {"val": val_loss}, self.global_step
                     )
@@ -233,7 +234,7 @@ class Trainer:
                         self.save_checkpoint(epoch, val_loss, self.model)
 
             # train logging
-            if self.rank in [-1, 0]:
+            if self.main_process:
                 if self.global_step % self.log_step == 0:
                     logging.info(
                         f"[TRN] Version: {self.version} | Epoch: {epoch} | Global step: {self.global_step} | Train loss: {loss.item():.3f} | LR: {self.optimizer.param_groups[0]['lr']:.5f}"
@@ -256,7 +257,7 @@ class Trainer:
             enumerate(self.valid_loader),
             desc="valid_steps",
             total=len(self.valid_loader),
-            disable=self.rank not in [-1, 0],
+            disable=not self.main_process,
         ):
             input_ids = batch["input_ids"]
             attention_mask = input_ids.ne(self.pad_idx).float()
