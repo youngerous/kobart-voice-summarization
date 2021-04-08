@@ -1,4 +1,5 @@
 # Eng-Kor Transliterator (영한 음역기)
+### [source : gritmind/engkor_transliterator](https://github.com/gritmind/engkor_transliterator)
 
 This project is for building a transliterator, transferring a word from the alphabet of Englsih to Korean. To be robust, it is made by deep learning model, that is, "sequence to sequence with attention" model, rather than rule based model. Training data is mainly from names of people or places. You can use this system via simply python import. See `Usage`.
 
