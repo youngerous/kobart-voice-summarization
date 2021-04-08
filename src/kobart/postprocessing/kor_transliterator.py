@@ -2,9 +2,9 @@
 * TODO : 보다 더 많은 학습시간, 데이터를 활용하여 다음과 같은 음역과정 없이 음성합성 모델이 영어나 숫자 읽는 법을 학습하도록 해야함.
         현재는 본 프로젝트가 중점적으로 다루고 있는 '뉴스 기사 요약문'을 커버할 정도의 기본적인 음역 모듈을 구축
 
-* 본 모듈을 톻해 음역 가능한 있는 주요 단어 
+* 본 모듈을 톻해 음역 가능한 있는 주요 단어
         1) 기호 : 뉴스 기사에서 자주 쓰이는 날짜, 시각, %, %p,℃ 등
-        2) 영어 : 1글자 및 3글자 이상의 영어 단어는 대체로 음역이 잘 되나, 두글자의 경우 불완전한 경우를 보임 
+        2) 영어 : 1글자 및 3글자 이상의 영어 단어는 대체로 음역이 잘 되나, 두글자의 경우 불완전한 경우를 보임
                  (e.g. 'yg': 이지(X), 'sm': 에스엠 (O))
         3) 숫자 : '억'단위의 자리수 및 소수점까지 한자어 수사(e.g. 일, 이, 삼...,)로 음역 가능
 
@@ -19,7 +19,7 @@ from engkor_transliterator import seq2seq_att_pt
 
 
 ####################
-# 숫자 한글 음역  모델 #
+# 숫자 영어 음역  모델 #
 ####################
 # surce :https://github.com/gritmind/engkor_transliterator
 
@@ -103,7 +103,7 @@ def digit2txt(strNum):
         index = index + 1
         if index >= len(strNum):
             break;
-        
+
         # DIFF(subin): 일십 -> 십 으로 출력되도록
         if len(resultStr) > 1 and '쩜' not in resultStr:
             if resultStr.startswith('일'):
@@ -114,18 +114,18 @@ def digit2txt(strNum):
 class Transliterator():
     def __init__(self, text):
         self.text = text
-        
-        
+
+
         # TODO(subin): handle more heuristic cases.
         self.special_cases = {'6월': '유월', '10월': '시월', '코로나19':'코로나일구', '1시':'한시', '2시':'두시', '3시':'세시', '4시':'네시', '5시':'다섯시',
                              '6시': '여섯시', '7시':'일곱시', '8시':'여덟시', '9시':'아홉시', '10시': '열시', '11시':'열한시', '12시':'열두시'}
         # careful of ordering units
         self.units = {'m':'미터', 'g':'그램', '%':'퍼센트', '%p':'퍼센트포인트',
                       'mm':'밀리미터', 'cm':'센티미터','km':'킬로미터', 'kg':'킬로그램', '℃':'도', 'm/s':'미터퍼세크', 'km/h':'킬로미터퍼아우어'}
-        
-        
+
+
     def _heuristic_transliteration(self):
-        
+
         for case, trans in self.special_cases.items():
              self.text = re.sub(case, trans, self.text)
 
@@ -134,11 +134,11 @@ class Transliterator():
         for unit, trans in self.units.items():
             pattern = re.compile('[0-9]+\s*{}'.format(unit))
             groups = pattern.finditer(self.text)
-          
+
             for group in groups:
-                idx_list.append((group.start(), group.end(), unit)) 
-                
-        
+                idx_list.append((group.start(), group.end(), unit))
+
+
         # reverse order to avoid index collision after replacing text.
         idx_list.reverse()
         for start, end, unit in idx_list:
@@ -147,16 +147,16 @@ class Transliterator():
             text2 = re.sub(unit, self.units[unit], text2)
             self.text = text1 + text2
 
-        
+
     def _eng2kor(self):
-        
+
         eng_idx_list = []
-        pattern = re.compile('[a-zA-Z]+') 
+        pattern = re.compile('[a-zA-Z]+')
         groups = pattern.finditer(self.text)
-                
+
         for group in groups:
             eng_idx_list.append((group.start(), group.end()))
-        
+
         # reverse order to avoid index collision after replacing text.
         eng_idx_list.reverse()
         for start, end in eng_idx_list:
@@ -164,17 +164,17 @@ class Transliterator():
             text2 = self.text[start:]
             text2 = re.sub(text2[0:end-start], eng2kor_model.decode_sequence(text2[0:end-start])[0] , text2)
             self.text = text1 + text2
-    
+
 
     def _num2kor(self):
-        
+
         num_idx_list = []
-        pattern = re.compile('[0-9]+\.?\d*') 
+        pattern = re.compile('[0-9]+\.?\d*')
         groups = pattern.finditer(self.text)
-        
+
         for group in groups:
             num_idx_list.append((group.start(), group.end()))
-            
+
         # reverse order to avoid index collision after replacing text.
         num_idx_list.reverse()
         for start, end in num_idx_list:
@@ -182,8 +182,8 @@ class Transliterator():
             text2 = self.text[start:]
             text2 = re.sub(text2[0:end-start], digit2txt(text2[0:end-start]), text2)
             self.text = text1 + text2
-    
-    
+
+
     def transliterate(self):
         self._heuristic_transliteration()
         self._eng2kor()
