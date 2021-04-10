@@ -192,7 +192,6 @@ class Trainer:
             labels = labels.to(self.device, non_blocking=True)
 
             # compute loss
-            self.optimizer.zero_grad()
             if self.hparams.amp:
                 with torch.cuda.amp.autocast():
                     output = self.model(
@@ -221,6 +220,7 @@ class Trainer:
                     self.scaler.step(self.optimizer)
                     self.scheduler.step()
                     self.scaler.update()
+                    self.optimizer.zero_grad()  # when accumulating, only after step()
                     self.global_step += 1
             else:
                 loss.backward()
@@ -230,12 +230,15 @@ class Trainer:
                     )
                     self.optimizer.step()
                     self.scheduler.step()
+                    self.optimizer.zero_grad()
                     self.global_step += 1
 
             train_loss.update(loss.item())
+            if (step + 1) % self.gradient_accumulation_step != 0:
+                continue
 
             # validate and logging
-            if (self.global_step + 1) % self.eval_step == 0:
+            if self.global_step != 0 and self.global_step % self.eval_step == 0:
                 val_loss = self.validate(epoch)
                 if self.main_process:
                     self.summarywriter.add_scalars(
@@ -249,7 +252,7 @@ class Trainer:
 
             # train logging
             if self.main_process:
-                if (self.global_step + 1) % self.log_step == 0:
+                if self.global_step != 0 and self.global_step % self.log_step == 0:
                     logging.info(
                         f"[TRN] Version: {self.version} | Epoch: {epoch} | Global step: {self.global_step} | Train loss: {loss.item():.3f} | LR: {self.optimizer.param_groups[0]['lr']:.5f}"
                     )
