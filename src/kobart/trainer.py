@@ -17,7 +17,7 @@ from tqdm import tqdm
 from transformers import AdamW, get_cosine_schedule_with_warmup
 
 
-from utils import AverageMeter, reduce_mean
+from utils import AverageMeter
 
 
 class Trainer:
@@ -37,8 +37,11 @@ class Trainer:
         self.model = model.to(self.device, non_blocking=True)
         if self.hparams.distributed:
             self.model = DDP(self.model, device_ids=[self.rank])
+        elif self.nprocs > 1:
+            self.model = nn.DataParallel(self.model)
 
         self.max_grad_norm = self.hparams.max_grad_norm
+        self.gradient_accumulation_step = self.hparams.gradient_accumulation_step
         self.tokenizer = tokenizer
         self.pad_idx = self.tokenizer.vocab["<pad>"]
 
@@ -81,7 +84,7 @@ class Trainer:
                 format="%(asctime)s > %(message)s",
             )
             logging.info(
-                f"[SCHEDULER] Total_step: {self.step_total} | Warmup step: {self.warmup_steps}"
+                f"[SCHEDULER] Total_step: {self.step_total} | Warmup step: {self.warmup_steps} | Accumulation step: {self.gradient_accumulation_step}"
             )
 
     def configure_optimizers(self):
@@ -107,7 +110,11 @@ class Trainer:
         optimizer = optim.AdamW(optimizer_grouped_parameters, lr=self.hparams.lr)
 
         # lr warmup scheduler
-        self.step_total = len(self.train_loader) * self.hparams.epoch
+        self.step_total = (
+            len(self.train_loader)
+            // self.gradient_accumulation_step
+            * self.hparams.epoch
+        )
         self.warmup_steps = math.ceil(self.step_total * self.hparams.warmup_ratio)
         scheduler = get_cosine_schedule_with_warmup(
             optimizer,
@@ -146,12 +153,15 @@ class Trainer:
         self.global_val_loss = val_loss
 
     def fit(self) -> dict:
+        # this zero gradient update is needed to avoid a warning message in warmup setting
+        self.optimizer.zero_grad()
+        self.optimizer.step()
+
         for epoch in tqdm(
             range(self.hparams.epoch), desc="epoch", disable=not self.main_process
         ):
             if self.hparams.distributed:
                 self.train_sampler.set_epoch(epoch)
-
             self._train_epoch(epoch)
 
         if self.main_process:
@@ -199,29 +209,33 @@ class Trainer:
                 )
                 loss = output.loss
 
-            # reduce and update
-            if self.hparams.distributed:
-                dist.barrier()
-                loss = reduce_mean(loss, self.nprocs)
-
+            # update
+            loss = loss / self.gradient_accumulation_step
             if self.hparams.amp:
                 self.scaler.scale(loss).backward()
-                self.scaler.unscale_(self.optimizer)
-                torch_utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
-                self.scaler.step(self.optimizer)
-                self.scheduler.step()
-                self.scaler.update()
+                if (step + 1) % self.gradient_accumulation_step == 0:
+                    self.scaler.unscale_(self.optimizer)
+                    torch_utils.clip_grad_norm_(
+                        self.model.parameters(), self.max_grad_norm
+                    )
+                    self.scaler.step(self.optimizer)
+                    self.scheduler.step()
+                    self.scaler.update()
+                    self.global_step += 1
             else:
                 loss.backward()
-                torch_utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
-                self.optimizer.step()
-                self.scheduler.step()
+                if (step + 1) % self.gradient_accumulation_step == 0:
+                    torch_utils.clip_grad_norm_(
+                        self.model.parameters(), self.max_grad_norm
+                    )
+                    self.optimizer.step()
+                    self.scheduler.step()
+                    self.global_step += 1
 
             train_loss.update(loss.item())
 
             # validate and logging
-            self.global_step += 1
-            if self.global_step % self.eval_step == 0:
+            if (self.global_step + 1) % self.eval_step == 0:
                 val_loss = self.validate(epoch)
                 if self.main_process:
                     self.summarywriter.add_scalars(
@@ -235,7 +249,7 @@ class Trainer:
 
             # train logging
             if self.main_process:
-                if self.global_step % self.log_step == 0:
+                if (self.global_step + 1) % self.log_step == 0:
                     logging.info(
                         f"[TRN] Version: {self.version} | Epoch: {epoch} | Global step: {self.global_step} | Train loss: {loss.item():.3f} | LR: {self.optimizer.param_groups[0]['lr']:.5f}"
                     )
@@ -281,11 +295,6 @@ class Trainer:
                 labels=labels,
             )
             loss = output.loss
-
-            # reduce
-            if self.hparams.distributed:
-                dist.barrier()
-                loss = reduce_mean(loss, self.nprocs)
             val_loss.update(loss.item())
 
         return val_loss.avg
