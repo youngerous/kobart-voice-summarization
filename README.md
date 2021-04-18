@@ -4,8 +4,9 @@
 
 ![thumbnail](assets/thumbnail.png)
 
-## 1. Overview
-TBD
+## 1. Inference Overview
+![process](assets/process.png)
+
 
 본 repo에서는 KoBART 학습코드(PyTorch)를 공개합니다.
 
@@ -18,14 +19,12 @@ pip install git+https://github.com/SKT-AI/KoBART#egg=kobart
 그 후 [requirements.txt](https://github.com/youngerous/kobart-voice-summarization/blob/main/requirements.txt)의 패키지를 설치합니다. [Dockerfile](https://github.com/youngerous/kobart-voice-summarization/blob/main/Dockerfile)로도 설치할 수 있습니다.
 
 
-학습은 Titan RTX 4장으로 수행하였습니다.
-
 ## 3. Code Structure
 ```sh
 # KoBART 문서요약 관련 코드
 src/kobart/
     └─ data/
-      └─ cached/ # tokenized indice with no special tokens
+      └─ cached/ # tokenized indice without special tokens
           ├─ cached_train.jsonl
           ├─ cached_dev.jsonl
           └─ cached_test.jsonl
@@ -35,8 +34,16 @@ src/kobart/
       ├─ processed_train.jsonl # only src, tgt text
       ├─ processed_dev.jsonl
       └─ processed_test.jsonl
+    └─ metric/
+      ├─ get_rouge.py
+      └─ rouge_metric.py
+    ├─ 1. data_sample.ipynb
+    ├─ 2. tokenizer_sample.ipynb
+    ├─ 3. dataset_sample.ipynb
+    ├─ 4. inference_sample.ipynb
     ├─ config.py
     ├─ dataset.py
+    ├─ inference.py
     ├─ main.py
     ├─ preprocess.py
     ├─ trainer.py
@@ -54,7 +61,7 @@ src/kobart/
 ### Voice Synthesis
 
 - Data: 네이버 오디오북, 밀리의서재
-  - Train $$$개
+  - Train 3,752개
 - Model: Tacotron2, Waveglow
 
 ## 5. How to 
