@@ -26,7 +26,15 @@ def main(rank, hparams, ngpus_per_node: int):
             rank=hparams.rank,
         )
 
-    tokenizer = get_kobart_tokenizer()
+    # get tokenizer
+    if hparams.distributed:
+        if rank != 0:
+            dist.barrier()
+        tokenizer = get_kobart_tokenizer()
+        if rank == 0:
+            dist.barrier()
+    else:
+        tokenizer = get_kobart_tokenizer()
 
     # get dataloaders
     loaders = [
