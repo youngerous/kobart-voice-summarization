@@ -50,11 +50,20 @@ class Trainer:
         self.train_sampler = self.train_loader.sampler
 
         # optimizer, scheduler
+        self.step_total = (
+            len(self.train_loader)
+            // self.gradient_accumulation_step
+            * self.hparams.epoch
+        )
         self.optimizer, self.scheduler = self.configure_optimizers()
 
         # model saving options
         self.global_step = 0
-        self.eval_step = int(self.step_total * hparams.eval_ratio)
+        self.eval_step = (
+            int(self.step_total * self.hparams.eval_ratio)
+            if self.hparams.eval_ratio > 0
+            else self.step_total // self.hparams.epoch
+        )
         if self.main_process:
             self.version = 0
             while True:
@@ -110,11 +119,6 @@ class Trainer:
         optimizer = optim.AdamW(optimizer_grouped_parameters, lr=self.hparams.lr)
 
         # lr warmup scheduler
-        self.step_total = (
-            len(self.train_loader)
-            // self.gradient_accumulation_step
-            * self.hparams.epoch
-        )
         self.warmup_steps = math.ceil(self.step_total * self.hparams.warmup_ratio)
         scheduler = get_cosine_schedule_with_warmup(
             optimizer,

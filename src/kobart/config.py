@@ -11,7 +11,12 @@ def load_config():
     parser.add_argument("--seed", type=int, default=42, help="Seed for reproducibility")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--log-step", type=int, default=200)
-    parser.add_argument("--eval-ratio", type=float, default=0.1)
+    parser.add_argument(
+        "--eval-ratio",
+        type=float,
+        default=0.1,
+        help="Evaluation will be done at the end of epoch if set to 0.0",
+    )
     parser.add_argument(
         "--distributed", action="store_true", default=False, help="Whether to use ddp"
     )
