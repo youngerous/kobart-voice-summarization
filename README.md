@@ -8,7 +8,7 @@
 ![process](assets/process.png)
 
 
-본 repo에서는 KoBART 학습코드(PyTorch)를 공개합니다.
+본 repository에서는 KoBART Fine-tuning을 위한 학습코드(PyTorch)를 공개합니다.
 
 ## 2. Environment
 먼저 아래의 명령어를 사용하여 KoBART를 다운로드합니다.
@@ -106,8 +106,8 @@ print(summary)
 
 ### Video
 - [제안발표영상](https://youtu.be/z6T3j-YmY1w)
-- [중간발표영상]()
-- [최종발표영상]()
+- 중간발표영상(추후 업로드 예정)
+- 최종발표영상(추후 업로드 예정)
 
 ### Demo
 
