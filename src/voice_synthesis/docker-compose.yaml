@@ -1,0 +1,34 @@
+version: '3.3'
+
+services:
+  tarcotron2:
+    build:
+      context: ./tacotron2
+      dockerfile: Dockerfile
+    runtime: nvidia
+    volumes:
+      - ./tacotron2:/tacotron2
+      - /home/hwkang/dsba/code/kobart_voice_summarization/resamp_data:/data
+#    environment:
+#      - output_directory=/tacotron2/output
+#      - log_directory=/tacotron2/log
+#      - n_gpus=1
+#      - training_files=/tacotron2/filelists/train_filelist.txt
+#      - validation_files=/tacotron2/filelists/train_filelist.txt
+#      - epochs=500
+#    command: python train.py --output_directory=$output_directory --log_directory=$log_directory --n_gpus=$n_gpus --training_files=$training_files --validation_files=$validation_files --epochs=$epochs
+    command: sh run.sh
+
+  waveglow:
+    build:
+      context: ./waveglow
+      dockerfile: Dockerfile
+    runtime: nvidia
+    volumes:
+      - ./waveglow:/waveglow
+      - ./tacotron2:/tacotron2
+      - /home/hwkang/dsba/code/kobart_voice_summarization/resamp_data:/data
+#    depends_on:
+#      tarcotron2:
+#          condition: service_completed_successfully
+    command: python train.py -c config.json

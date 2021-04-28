@@ -3,6 +3,12 @@ src/kobart/data/
 src/kobart/checkpoints/
 src/kobart/__pycache__
 
+# audio clip data
+/data
+/resamp_data
+*.txt
+*.csv
+
 # Created by https://www.toptal.com/developers/gitignore/api/windows,vscode,jupyternotebooks,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,vscode,jupyternotebooks,linux,macos
 
@@ -71,6 +77,9 @@ Temporary Items
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+### pycharm ###
+.idea
 
 ### Windows ###
 # Windows thumbnail cache files

@@ -1,0 +1,5 @@
+# config.yaml
+
+tacotron2_checkpoint: /tacotron2/
+waveglow_checkpoint: /waveglow
+

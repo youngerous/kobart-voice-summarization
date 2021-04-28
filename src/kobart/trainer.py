@@ -46,7 +46,7 @@ class Trainer:
         self.pad_idx = self.tokenizer.vocab["<pad>"]
 
         # dataloader and distributed sampler
-        self.train_loader, self.valid_loader, self.test_loader = loaders
+        self.train_loader, self.valid_loader = loaders
         self.train_sampler = self.train_loader.sampler
 
         # optimizer, scheduler
@@ -307,15 +307,13 @@ class Trainer:
         return val_loss.avg
 
     @torch.no_grad()
-    def test(self, state_dict) -> dict:
+    def test(self, test_loader, state_dict) -> dict:
         test_loss = AverageMeter()
 
         self.model.load_state_dict(state_dict)
         self.model.eval()
         for step, batch in tqdm(
-            enumerate(self.test_loader),
-            desc="tst_steps",
-            total=len(self.test_loader),
+            enumerate(test_loader), desc="tst_steps", total=len(test_loader)
         ):
             input_ids = batch["input_ids"]
             attention_mask = input_ids.ne(self.pad_idx).float()

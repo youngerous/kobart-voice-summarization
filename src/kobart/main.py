@@ -46,7 +46,7 @@ def main(rank, hparams, ngpus_per_node: int):
             workers=hparams.workers,
             distributed=hparams.distributed,
         )
-        for mode in ["train", "dev", "test"]
+        for mode in ["train", "dev"]
     ]
 
     # get model
@@ -71,7 +71,14 @@ def main(rank, hparams, ngpus_per_node: int):
                 os.path.join(hparams.ckpt_path, f"version-{version}/best_model_*.pt")
             )[0]
         )
-        test_result = trainer.test(state_dict)
+        test_loader = get_loader(
+            tok=tokenizer,
+            batch_size=hparams.batch_size,
+            path=hparams.root_path,
+            mode="test",
+            workers=hparams.workers,
+        )
+        test_result = trainer.test(test_loader, state_dict)
 
         # save result
         best_result.update(test_result)

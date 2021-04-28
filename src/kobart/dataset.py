@@ -13,21 +13,15 @@ from utils import SequentialDistributedSampler
 class SummaryDataset(Dataset):
     """Bflysoft Abstractive Summarization Dataset
 
-    :param root_path: Root path of dataset
-    :param mode: Choose 'train', 'dev', or 'test'
-    :param tok: Kobart tokenizer to use
-    :param max_len: Maximum length of BART input
-    :param ignore_index: Default ignore index calculating cross entropy loss
+    Args:
+        root_path (str): Root path of dataset
+        mode (str): Choose 'train', 'dev', or 'test'
+        tok (BertTokenizer): Kobart tokenizer
+        max_len (int): Maximum length of sequence
+        ignore_index (int): Default ignore index calculating cross entropy loss
     """
 
-    def __init__(
-        self,
-        root_path: str,
-        mode: str,
-        tok,
-        max_len: int = 512,
-        ignore_index: int = -100,
-    ):
+    def __init__(self, root_path, mode, tok, max_len=512, ignore_index=-100):
         super(SummaryDataset, self).__init__()
         assert mode in ["train", "dev", "test"]
 
@@ -94,18 +88,18 @@ class SummaryDataset(Dataset):
         }
 
 
-def get_loader(
-    tok, batch_size: int, path: str, workers: int, mode: str, distributed: bool = False
-) -> DataLoader:
+def get_loader(tok, batch_size, path, workers, mode, distributed=False) -> DataLoader:
     """
-    :param tok: Kobart tokenizer to use
-    :param batch_size: Mini-batch size
-    :param path: Root path of dataset
-    :param workers: Number of dataloader workers
-    :param mode: Choose 'train', 'dev', or 'test'
-    :param distributed: Whether to use ddp
+    Args:
+        tok (BertTokenizer): Kobart tokenizer
+        batch_size (int): Mini-batch size per process
+        path (str): Root path of dataset
+        workers (int): Number of dataloader workers
+        mode (str): Choose 'train', 'dev', or 'test'
+        distributed (bool): Whether to use ddp. Defaults=False
 
-    :return: dataloader
+    Returns:
+        DataLoader
     """
     assert mode in ["train", "dev", "test"]
 
