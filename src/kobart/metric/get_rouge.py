@@ -117,8 +117,8 @@ class generate_summary:
             summ = get_summarized_text(self.ckpt, text)
             generated.append(summ)
         print(f'{stop} summary generated')
-        hyp_df = pd.DataFrame({'id': ids[:self.inference_stop],'summary': generated})
-        ref_df = pd.DataFrame({'id':ids[:self.inference_stop], 'summary': summary[:self.inference_stop]})
+        hyp_df = pd.DataFrame({'id': ids[:stop],'summary': generated})
+        ref_df = pd.DataFrame({'id':ids[:stop], 'summary': summary[:stop]})
         
         hyp_df.to_csv(self.generated_summary_path+f"generated_{self.data_type}_{self.ckpt[-36:]}_{self.inference_stop}.csv")
         ref_df.to_csv(self.generated_summary_path+f"true_{self.data_type}_{self.ckpt[-36:]}_{self.inference_stop}.csv")
@@ -139,7 +139,6 @@ class generate_summary:
             ids.append(json.loads(text)['id'])
             article.append(json.loads(text)['article_original'])
             summary.append(json.loads(text)['abstractive'])
-
         return ids, article, summary
 
 
@@ -173,7 +172,7 @@ if __name__ == "__main__":
         "--ckpt",
         type=str,
         default="./ckpt/best_model_step_20365_loss_1.9004.pt",
-        help="type the path for yout checkpoint",
+        help="type the path for your checkpoint",
     )
     parser.add_argument(
         "--data_path",
