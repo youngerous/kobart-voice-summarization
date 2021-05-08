@@ -8,7 +8,7 @@
 ![process](assets/process.png)
 
 
-본 repository에서는 KoBART Fine-tuning을 위한 학습코드(PyTorch)를 공개합니다.
+본 README에서는 KoBART Fine-tuning을 위한 과정을 안내합니다.
 
 ## 2. Environment
 먼저 아래의 명령어를 사용하여 KoBART를 다운로드합니다.
