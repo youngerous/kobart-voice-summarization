@@ -7,7 +7,7 @@
 
 
 ## 1.1. 정량적인 평가
-10000개의 test data로 성능을 측정하였고, [Dacon 한국어 문서 생성요약 AI 경진대회의 metric](https://dacon.io/competitions/official/235673/talkboard/401911?page=1&dtype=recent)을 사용하였습니다.
+10000개의 test data로 성능을 측정하였고, [Dacon 한국어 문서 생성요약 AI 경진대회의 metric](https://dacon.io/competitions/official/235673/talkboard/401911?page=1&dtype=recent)을 사용하였습니다. Mecab 라이브러리 설치가 필요하신 분은 [이 블로그](https://somjang.tistory.com/entry/PythonUbuntu%EC%97%90-mecab-ko-dic-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0)를 참고해주세요.
 
 |           | Rouge-1 | Rouge-2 | Rouge-L |
 | :-------: | :-----: | :-----: | :-----: |
@@ -15,7 +15,7 @@
 |  Recall   |  0.601  |  0.399  |  0.476  |
 | F1-Score  |  0.507  |  0.339  |  0.403  |
 
-> 현재 데이터가 공개되지 않아 정량적인 수치를 비교할 방법론은 없습니다. 
+> 현재 데이터가 공개되지 않아 정량적인 수치를 비교할 방법론이 아직 없습니다. 
 
 ## 1.2. 정성적인 평가
 
