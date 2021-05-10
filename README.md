@@ -1,4 +1,4 @@
-# Kobart Voice Summarization
+# KoBART Voice Summarization
 2021년도 1학기 고려대학교 산업경영공학과 [비정형데이터분석](https://github.com/pilsung-kang/Text-Analytics) 수업 팀프로젝트 repository입니다. <br>
 
 

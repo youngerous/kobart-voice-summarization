@@ -175,13 +175,14 @@ class Trainer:
     def _train_epoch(self, epoch: int) -> None:
         train_loss = AverageMeter()
 
-        self.model.train()
         for step, batch in tqdm(
             enumerate(self.train_loader),
             desc="train_steps",
             total=len(self.train_loader),
             disable=not self.main_process,
         ):
+            self.model.train()
+
             input_ids = batch["input_ids"]
             attention_mask = input_ids.ne(self.pad_idx).float()
             dec_input_ids = batch["decoder_input_ids"]
