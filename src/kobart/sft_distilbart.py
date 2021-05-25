@@ -28,7 +28,7 @@ class DistilKoBART(nn.Module):
         Pre-trained Summarization Distillation(https://arxiv.org/abs/2010.13002)
 
     Code Reference:
-        https://github.com/huggingface/transformers/blob/49e4fece5c5cfb31615a3bddcff15517333e6fb6/examples/seq2seq/make_student.py#L114
+        https://github.com/huggingface/transformers/blob/49e4fece5c5cfb31615a3bddcff15517333e6fb6/examples/seq2seq/make_student.py
     """
 
     def __init__(self, teacher, n_enc=None, n_dec=None):
