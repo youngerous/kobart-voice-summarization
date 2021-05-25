@@ -9,7 +9,7 @@ from transformers import BartForConditionalGeneration
 from config import load_config
 from dataset import get_loader
 from kobart import get_kobart_tokenizer, get_pytorch_kobart_model
-from sft_distilbart import DistilKoBART
+from distilbart import DistilBART
 from trainer import Trainer
 from utils import ResultWriter, fix_seed
 
@@ -61,7 +61,7 @@ def main(rank, hparams, ngpus_per_node: int):
         model = BartForConditionalGeneration.from_pretrained(get_pytorch_kobart_model())
 
     if hparams.distill:
-        model = DistilKoBART(model, n_enc=hparams.n_enc, n_dec=hparams.n_dec)
+        model = DistilBART(model, n_enc=hparams.n_enc, n_dec=hparams.n_dec)
 
     # training phase
     trainer = Trainer(hparams, tokenizer, loaders, model, resultwriter)

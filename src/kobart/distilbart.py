@@ -15,7 +15,7 @@ LAYERS_TO_COPY = {
 }
 
 
-class DistilKoBART(nn.Module):
+class DistilBART(nn.Module):
     """
     Distilled version using Shrink-and-Finetune(SFT) method.
 
@@ -32,7 +32,7 @@ class DistilKoBART(nn.Module):
     """
 
     def __init__(self, teacher, n_enc=None, n_dec=None):
-        super(DistilKoBART, self).__init__()
+        super(DistilBART, self).__init__()
         # load teacher
         self.teacher = teacher
 
