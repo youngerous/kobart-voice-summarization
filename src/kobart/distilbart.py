@@ -76,9 +76,20 @@ class DistilBART(nn.Module):
         )
         self.teacher = None
 
-    def forward(self, input_ids, attention_mask, labels):
+    def forward(
+        self,
+        input_ids,
+        attention_mask,
+        labels,
+        decoder_input_ids=None,
+        decoder_attention_mask=None,
+    ):
         return self.student(
-            input_ids=input_ids, attention_mask=attention_mask, labels=labels
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            labels=labels,
+            decoder_input_ids=decoder_input_ids,
+            decoder_attention_mask=decoder_attention_mask,
         )
 
     def copy_layers(
