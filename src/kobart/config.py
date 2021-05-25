@@ -43,5 +43,19 @@ def load_config():
     parser.add_argument("--max-grad-norm", type=float, default=1.0)
     parser.add_argument("--gradient-accumulation-step", type=int, default=1)
 
+    # distillation hparams
+    parser.add_argument(
+        "--distill",
+        action="store_true",
+        default=False,
+        help="Apply shrink-and-finetune distillation",
+    )
+    parser.add_argument(
+        "--n_enc", type=int, default=6, help="Number of student encoder layers"
+    )
+    parser.add_argument(
+        "--n_dec", type=int, default=6, help="Number of student decoder layers"
+    )
+
     args = parser.parse_args()
     return args

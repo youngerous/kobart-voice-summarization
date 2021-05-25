@@ -6,7 +6,6 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.distributed import DistributedSampler
 
-from kobart import get_kobart_tokenizer
 from utils import SequentialDistributedSampler
 
 

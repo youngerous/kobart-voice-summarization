@@ -6,7 +6,6 @@ import random
 from typing import *
 
 import torch
-import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.utils as torch_utils
 import torch.optim as optim
