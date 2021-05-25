@@ -106,7 +106,7 @@ print(summary)
 
 ### Video
 - [제안발표영상](https://youtu.be/z6T3j-YmY1w)
-- 중간발표영상(추후 업로드 예정)
+- [중간발표영상](https://youtu.be/_BTggEcjYqE)
 - 최종발표영상(추후 업로드 예정)
 
 ### Demo
