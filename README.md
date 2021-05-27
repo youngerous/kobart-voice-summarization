@@ -57,7 +57,8 @@ src/kobart/
 
 - Data: 한국어 생성요약 뉴스 데이터 일부 (Bflysoft - [AI Hub를 통해 공개 예정](https://aihub.or.kr/aidata/8054))
   - Train 260,697개 / Valid 10,000개 / Test 10,000개
-- Model: KoBART 
+- Model: KoBART, DistilKoBART
+  - DistilKoBART는 huggingface의 [Pre-trained Summarization Distillation(2020)](https://arxiv.org/abs/2010.13002) 논문에서 제안된 방법론으로, Fine-tuning 시 Pre-trained 레이어의 일부만을 사용하는 모델입니다.
 
 ### Voice Synthesis
 
@@ -123,6 +124,7 @@ print(summary)
 ## 8. Reference
 
 - [[Paper] BART](https://arxiv.org/abs/1910.13461)
+- [[Paper] Pre-trained Summarization Distillation](https://arxiv.org/abs/2010.13002)
 - [[Repo] KoBART :: SKT-AI](https://github.com/SKT-AI/KoBART)
 - [[Repo] KoBART-summarization :: seujung](https://github.com/seujung/KoBART-summarization)
 - [[Post] 타코트론2 TTS 시스템 :: joungheekim](https://joungheekim.github.io/2021/04/01/code-review/)

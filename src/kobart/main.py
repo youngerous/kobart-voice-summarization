@@ -63,6 +63,9 @@ def main(rank, hparams, ngpus_per_node: int):
     if hparams.distill:
         model = DistilBART(model, n_enc=hparams.n_enc, n_dec=hparams.n_dec)
 
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"[Model Parameters] {num_params}")
+
     # training phase
     trainer = Trainer(hparams, tokenizer, loaders, model, resultwriter)
     best_result = trainer.fit()
