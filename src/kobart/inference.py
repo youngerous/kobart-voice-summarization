@@ -4,15 +4,19 @@ from pprint import pprint
 
 import torch
 from kobart import get_kobart_tokenizer, get_pytorch_kobart_model
+from distilbart import DistilBART
 from transformers import BartForConditionalGeneration
 
 MODEL = BartForConditionalGeneration.from_pretrained(get_pytorch_kobart_model())
 MODEL.to("cpu")
 TOK = get_kobart_tokenizer()
-INITIALIZED = False
+INITIALIZED_WEIGHT = False
+INITIALIZED_MODEL = False
 
 
-def initialize(ckpt: str) -> None:
+def initialize(model, ckpt: str) -> None:
+    global MODEL
+    global INITIALIZED_WEIGHT
     # cpu load
     state_dict = torch.load(ckpt, map_location=torch.device("cpu"))
 
@@ -23,20 +27,31 @@ def initialize(ckpt: str) -> None:
         new_state_dict[name] = v
 
     MODEL.load_state_dict(new_state_dict, strict=True)
-    MODEL.eval()
-    INITIALIZED = True
+    INITIALIZED_WEIGHT = True
 
 
 @torch.no_grad()
-def get_summarized_text(ckpt: str, text: str) -> str:
-    if not INITIALIZED:
-        initialize(ckpt)
+def get_summarized_text(ckpt: str, text: str, n_enc: int=6, n_dec: int=6) -> str:
+    global MODEL
+    global INITIALIZED_MODEL
+    global INITIALIZED_WEIGHT
+    distilled = n_enc != 6 or n_dec != 6
 
+    if (not INITIALIZED_MODEL) and (distilled):
+        MODEL = DistilBART(MODEL, n_enc=n_enc, n_dec=n_dec).to("cpu")
+        INITIALIZED_MODEL = True
+    if not INITIALIZED_WEIGHT:
+        initialize(MODEL, ckpt)
+
+    MODEL.eval()
     text = text.replace("\n", "")
     input_ids = TOK.encode(text)
     input_ids = torch.tensor(input_ids)
     input_ids = input_ids.unsqueeze(0)
-    output = MODEL.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
+    if distilled:
+        output = MODEL.student.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
+    else:
+        output = MODEL.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
     output = TOK.decode(output[0], skip_special_tokens=True)
     return output
 

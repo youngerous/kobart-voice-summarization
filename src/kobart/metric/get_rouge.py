@@ -36,7 +36,7 @@ class RougeScorer:
 
         #결측치 처리
         hyp_df.iloc[:, 1] = hyp_df.iloc[:, 1].fillna(" ")
-        
+
         # ref에 있는 article만 남김
         ids = ref_df["id"]
         hyp_df = hyp_df[hyp_df["id"].isin(ids)]
@@ -45,7 +45,7 @@ class RougeScorer:
         # id로 정렬
         ref_df = ref_df.sort_values(by=["id"])
         hyp_df = hyp_df.sort_values(by=["id"])
-        
+
         # id -> int
         ref_df["id"] = ref_df["id"].astype(int)
         hyp_df["id"] = hyp_df["id"].astype(int)
@@ -98,8 +98,11 @@ class generate_summary:
         self.data_type = args.data_type
         self.generated_summary_path = args.generated_summary_path
         self.inference_stop = args.inference_stop
+
+        self.n_enc = args.n_enc
+        self.n_dec = args.n_dec
     # generate sumamary
-     
+
     def generate(self):
 
         # 먼저 data load
@@ -112,14 +115,14 @@ class generate_summary:
                 stop = len(article)
             elif i >= stop:
                 break
-               
+
             text = ''.join(text)
-            summ = get_summarized_text(self.ckpt, text)
+            summ = get_summarized_text(self.ckpt, text, n_enc=self.n_enc, n_dec=self.n_dec)
             generated.append(summ)
         print(f'{stop} summary generated')
         hyp_df = pd.DataFrame({'id': ids[:stop],'summary': generated})
         ref_df = pd.DataFrame({'id':ids[:stop], 'summary': summary[:stop]})
-        
+
         hyp_df.to_csv(self.generated_summary_path+f"generated_{self.data_type}_{self.ckpt[-36:]}_{self.inference_stop}.csv")
         ref_df.to_csv(self.generated_summary_path+f"true_{self.data_type}_{self.ckpt[-36:]}_{self.inference_stop}.csv")
 
@@ -148,7 +151,7 @@ class generate_summary:
 
         hyp_df = hyp_df.iloc[:, 1:]
         ref_df = ref_df.iloc[:, 1:]
-        
+
         return hyp_df, ref_df
 
 
@@ -204,17 +207,19 @@ if __name__ == "__main__":
         default=-1,
         help="=type the number of article to generate summary. if you want to generate all, type '-1' ",
     )
+    parser.add_argument('--n_enc', type=int, default=6)
+    parser.add_argument('--n_dec', type=int, default=6)
 
     args = parser.parse_args()
 
     scorer = RougeScorer(args)
     infernece = generate_summary(args)
-    
+
     # generation == True
     if args.generation == True:
         print(f'start to generate abstractive summary ({args.inference_stop})')
         hyp_df, ref_df = infernece.generate()
-         
+
     # else 저장된 hyp_df, ref_df 불러와서 rouge score 계산
     else:
         try:
@@ -223,11 +228,11 @@ if __name__ == "__main__":
         except:
             print('generated summary not exists')
             hyp_df, ref_df = infernece.generate()
-    
+
     # rouge score 계산
     rouge_score = scorer.compute_rouge(ref_df, hyp_df)
 
-    
 
-        
-        
+
+
+
