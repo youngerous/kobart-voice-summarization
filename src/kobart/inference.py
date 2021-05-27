@@ -14,7 +14,7 @@ INITIALIZED_WEIGHT = False
 INITIALIZED_MODEL = False
 
 
-def initialize(model, ckpt: str) -> None:
+def initialize(ckpt: str) -> None:
     global MODEL
     global INITIALIZED_WEIGHT
     # cpu load
@@ -31,17 +31,17 @@ def initialize(model, ckpt: str) -> None:
 
 
 @torch.no_grad()
-def get_summarized_text(ckpt: str, text: str, n_enc: int=6, n_dec: int=6) -> str:
+def get_summarized_text(ckpt: str, text: str, n_enc: int = 6, n_dec: int = 6) -> str:
     global MODEL
     global INITIALIZED_MODEL
     global INITIALIZED_WEIGHT
-    distilled = n_enc != 6 or n_dec != 6
 
+    distilled = n_enc != 6 or n_dec != 6
     if (not INITIALIZED_MODEL) and (distilled):
         MODEL = DistilBART(MODEL, n_enc=n_enc, n_dec=n_dec).to("cpu")
         INITIALIZED_MODEL = True
     if not INITIALIZED_WEIGHT:
-        initialize(MODEL, ckpt)
+        initialize(ckpt)
 
     MODEL.eval()
     text = text.replace("\n", "")
@@ -49,7 +49,9 @@ def get_summarized_text(ckpt: str, text: str, n_enc: int=6, n_dec: int=6) -> str
     input_ids = torch.tensor(input_ids)
     input_ids = input_ids.unsqueeze(0)
     if distilled:
-        output = MODEL.student.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
+        output = MODEL.student.generate(
+            input_ids, eos_token_id=1, max_length=512, num_beams=5
+        )
     else:
         output = MODEL.generate(input_ids, eos_token_id=1, max_length=512, num_beams=5)
     output = TOK.decode(output[0], skip_special_tokens=True)
