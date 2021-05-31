@@ -81,12 +81,28 @@ class RougeScorer:
         with open(f"../results/rouge_score/{self.data_type}_{self.ckpt[-36:]}_{self.inference_stop}_rouge_scores.txt", "w") as output:
             output.write(str_scores)
 
+    # def format_rouge_scores(self, scores):
+    #     return "{:.3f},{:.3f},{:.3f}".format(
+    #         scores["rouge-1"]["f"],
+    #         scores["rouge-2"]["f"],
+    #         scores["rouge-l"]["f"],
+    #     )
+
     def format_rouge_scores(self, scores):
-        return "{:.3f},{:.3f},{:.3f}".format(
+        return "f1 score: {:.4f},{:.4f},{:.4f} \n recall: {:.4f},{:.4f},{:.4f} \n precision: {:.4f},{:.4f},{:.4f}".format(
             scores["rouge-1"]["f"],
             scores["rouge-2"]["f"],
             scores["rouge-l"]["f"],
+
+            scores["rouge-1"]["r"],
+            scores["rouge-2"]["r"],
+            scores["rouge-l"]["r"],
+
+            scores["rouge-1"]["p"],
+            scores["rouge-2"]["p"],
+            scores["rouge-l"]["p"],
         )
+
 
 
 # for infernece
