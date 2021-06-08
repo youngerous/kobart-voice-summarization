@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  kobart:
+    image: kobart
+    runtime: nvidia
+    volumes:
+      - ../../kobart:/kobart
+      - ../../voice:/voice
+      - ./:/inference
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    working_dir: /inference
+    command: sh kobart.sh
+
+  voice_synthesis:
+    image: voice_inference
+    runtime: nvidia
+    volumes:
+      - ../waveglow:/waveglow
+      - ../tacotron2:/tacotron2
+      - ./:/inference
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    working_dir: /inference
+    depends_on:
+      kobart:
+          condition: service_completed_successfully
+    command: python voice_inference.py

@@ -1,5 +1,6 @@
 # config.yaml
 
-tacotron2_checkpoint: /tacotron2/
-waveglow_checkpoint: /waveglow
+tacotron2_checkpoint: /voice_synthesis/tacotron2/output/checkpoint_420000
+waveglow_checkpoint: /voice_synthesis/waveglow/checkpoints/waveglow_930000
 
+sample_text: 안녕하세요오오 저느으은   시니이인 작까아 장기하입니다

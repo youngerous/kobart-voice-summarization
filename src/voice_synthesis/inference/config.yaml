@@ -1,0 +1,13 @@
+# config.yaml
+
+kobart_ckpt : /kobart/checkpoints/best_model_step_40730_loss_1.8838.pt
+distilkobart_ckpt : /kobart/checkpoints/best_model_step_65168_loss_2.2167.pt
+
+n_enc : 6
+n_dec : 6
+
+input_txt : /inference/input.txt
+output_txt : /inference/output.txt
+
+tacotron2_checkpoint: /tacotron2/output/checkpoint_420000
+waveglow_checkpoint: /waveglow/checkpoints/waveglow_930000

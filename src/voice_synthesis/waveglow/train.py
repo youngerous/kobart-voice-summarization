@@ -60,8 +60,8 @@ def save_checkpoint(model, optimizer, learning_rate, iteration, filepath):
                 'learning_rate': learning_rate}, filepath)
 
 def train(num_gpus, rank, group_name, output_directory, epochs, learning_rate,
-          sigma, iters_per_checkpoint, batch_size, seed, fp16_run,
-          checkpoint_path, with_tensorboard):
+          sigma, iters_per_checkpoint, batch_size, gradient_accumulation_steps,
+          seed, fp16_run, checkpoint_path, with_tensorboard):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     #=====START: ADDED FOR DISTRIBUTED======
@@ -125,6 +125,10 @@ def train(num_gpus, rank, group_name, output_directory, epochs, learning_rate,
             outputs = model((mel, audio))
 
             loss = criterion(outputs)
+
+            if gradient_accumulation_steps > 1:
+                loss = loss / gradient_accumulation_steps
+
             if num_gpus > 1:
                 reduced_loss = reduce_tensor(loss.data, num_gpus).item()
             else:
@@ -136,18 +140,23 @@ def train(num_gpus, rank, group_name, output_directory, epochs, learning_rate,
             else:
                 loss.backward()
 
-            optimizer.step()
+            if (iteration + 1) % gradient_accumulation_steps == 0:
+                optimizer.step()
+                model.zero_grad()
+                print("{}:\t{:.9f}".format(iteration, reduced_loss))
+                if with_tensorboard and rank == 0:
+                    logger.add_scalar(
+                        "training_loss", reduced_loss, i + len(train_loader) * epoch
+                    )
 
-            print("{}:\t{:.9f}".format(iteration, reduced_loss))
-            if with_tensorboard and rank == 0:
-                logger.add_scalar('training_loss', reduced_loss, i + len(train_loader) * epoch)
-
-            if (iteration % iters_per_checkpoint == 0):
+            if iteration % iters_per_checkpoint == 0:
                 if rank == 0:
                     checkpoint_path = "{}/waveglow_{}".format(
-                        output_directory, iteration)
-                    save_checkpoint(model, optimizer, learning_rate, iteration,
-                                    checkpoint_path)
+                        output_directory, iteration
+                    )
+                    save_checkpoint(
+                        model, optimizer, learning_rate, iteration, checkpoint_path
+                    )
 
             iteration += 1
 

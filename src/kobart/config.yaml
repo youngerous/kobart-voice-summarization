@@ -1,0 +1,5 @@
+kobart_ckpt : ./checkpoints/version-16/best_model_step_40730_loss_1.8838.pt
+distilkobart_ckpt : ./checkpoints/version-22/best_model_step_65168_loss_2.2167.pt
+
+input_txt : /inference/input.txt
+output_txt : /inference/output.txt

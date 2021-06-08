@@ -1,9 +1,10 @@
-FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
+FROM pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
 
 RUN apt-get update -y
 RUN apt-get install git -y
 RUN git clone https://github.com/NVIDIA/apex
+RUN apt-get install libsndfile1
 #ADD apex /apex/
 
 COPY requirements.txt /

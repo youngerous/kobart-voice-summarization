@@ -9,8 +9,8 @@ defaults = {
     'iters_per_checkpoint':10000,
     'seed':1234,
     'dynamic_loss_scaling':True,
-    'fp16_run':False,
-    'distributed_run':False,
+    'fp16_run':True,
+    'distributed_run':True,
     'dist_backend':"nccl",
     'dist_url':"tcp://localhost:54321",
     'cudnn_enabled':True,
@@ -20,7 +20,7 @@ defaults = {
     ################################
     # Data Parameters             #
     ################################
-    'load_mel_from_disk':False,
+    'load_mel_from_disk':True,
     'training_files':'filelists/train_filelist.txt',
     'validation_files':'filelists/val_filelist.txt',
     'text_cleaners':"['korean_cleaners']",  ##한글을 사용하려면 "['korean_cleaners']"   -> str 형태로 입력해야 함
@@ -78,7 +78,7 @@ defaults = {
     'weight_decay':1e-6,
     'grad_clip_thresh':1.0,
     'batch_size':32,
-    'gradient_accumulation_steps':2,
+    'gradient_accumulation_steps':1,
     'mask_padding':True  # set model's padded outputs to padded values
 }
 

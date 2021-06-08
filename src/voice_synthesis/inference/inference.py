@@ -151,7 +151,7 @@ if __name__ == "__main__":
     sample_text = config['sample_text']
     audio, sampling_rate = synthesizer.inference(sample_text)
     ## 음성 저장하기
-    sf.write('문장.wav', audio, sampling_rate)
+    sf.write('result.wav', audio, sampling_rate)
     #
     # ## 구문 생성
     # sample_phrase = """

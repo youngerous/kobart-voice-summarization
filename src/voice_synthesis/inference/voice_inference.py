@@ -6,9 +6,9 @@ import os
 import argparse
 
 ## WaveGlow 프로젝트 위치 설정
-sys.path.append('waveglow/')
+sys.path.append('/waveglow/')
 ## Tacontron2 프로젝트 위치 설정
-sys.path.append('tacotron2/')
+sys.path.append('/tacotron2/')
 
 ## 프로젝트 라이브러리 Import
 from hparams import defaults
@@ -25,7 +25,6 @@ from denoiser import Denoiser
 from tqdm.notebook import tqdm
 import soundfile as sf
 import yaml
-
 import torch.distributed as dist
 from torch.multiprocessing import Process
 
@@ -70,7 +69,7 @@ class Synthesizer:
 
         self.tacotron = model
 
-        with open('waveglow/config.json') as f:
+        with open('/waveglow/config.json') as f:
             data = f.read()
         config = json.loads(data)
         waveglow_config = config["waveglow_config"]
@@ -136,9 +135,8 @@ if __name__ == "__main__":
     #
     # for p in processes:
     #     p.join()
-
     with open('config.yaml') as f:
-        config = yaml.load(f)
+        config = yaml.safe_load(f)
 
     ## 체크포인트 설정
     tacotron2_checkpoint = config['tacotron2_checkpoint']
@@ -148,10 +146,36 @@ if __name__ == "__main__":
     synthesizer = Synthesizer(tacotron2_checkpoint, waveglow_checkpoint)
 
     # ## 문장 생성
-    sample_text = config['sample_text']
-    audio, sampling_rate = synthesizer.inference(sample_text)
+    output_txt = config['output_txt']
+
+    with open(output_txt, 'r') as f:
+        text = f.read()
+
+    texts = text.split('.')
+
+    audios = []
+
+    for i, text in enumerate(texts):
+
+        if len(texts)==i-1:
+            break
+        split_text = text.split(' ')
+        if len(split_text)//15 == 0:
+            audio, sampling_rate = synthesizer.inference(text)
+            audios.extend(audio)
+        else:
+            for j in range(len(split_text)//15+1):
+                if 15*(j+1) >= len(split_text):
+                    new_text = ' '.join(split_text[15*j:])
+                else:
+                    new_text = ' '.join(split_text[15*j:15*(j+1)])
+                print(new_text)
+                audio, sampling_rate = synthesizer.inference_phrase(new_text)
+                audios.extend(audio)
+        # audios[i] = synthesizer.inference(text)
+
     ## 음성 저장하기
-    sf.write('문장.wav', audio, sampling_rate)
+    sf.write('result.wav', audios, sampling_rate)
     #
     # ## 구문 생성
     # sample_phrase = """
