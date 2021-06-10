@@ -11,17 +11,17 @@ sys.path.append('waveglow/')
 sys.path.append('tacotron2/')
 
 ## 프로젝트 라이브러리 Import
-from hparams import defaults
-from model import Tacotron2
-from layers import TacotronSTFT, STFT
-from audio_processing import griffin_lim
-from tacotron2.train import load_model
-from text import text_to_sequence
+from .tacotron2.hparams import defaults
+from .tacotron2.model import Tacotron2
+from .tacotron2.layers import TacotronSTFT, STFT
+from .tacotron2.audio_processing import griffin_lim
+from .tacotron2.train import load_model
+from .tacotron2.text import text_to_sequence
 from scipy.io.wavfile import write
 import IPython.display as ipd
 import json
-from waveglow.glow import WaveGlow
-from denoiser import Denoiser
+from .waveglow.glow import WaveGlow
+from .waveglow.denoiser import Denoiser
 from tqdm.notebook import tqdm
 import soundfile as sf
 import yaml
@@ -70,7 +70,7 @@ class Synthesizer:
 
         self.tacotron = model
 
-        with open('waveglow/config.json') as f:
+        with open('./voice_synthesis/waveglow/config.json') as f:
             data = f.read()
         config = json.loads(data)
         waveglow_config = config["waveglow_config"]

@@ -3,8 +3,8 @@ import torch
 from torch.autograd import Variable
 from torch import nn
 from torch.nn import functional as F
-from layers import ConvNorm, LinearNorm
-from utils import to_gpu, get_mask_from_lengths
+from .layers import ConvNorm, LinearNorm
+from .utils import to_gpu, get_mask_from_lengths
 
 
 class LocationLayer(nn.Module):

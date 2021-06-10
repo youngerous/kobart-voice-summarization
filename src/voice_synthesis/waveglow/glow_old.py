@@ -1,6 +1,6 @@
 import copy
 import torch
-from glow import Invertible1x1Conv, remove
+from .glow import Invertible1x1Conv, remove
 
 
 @torch.jit.script

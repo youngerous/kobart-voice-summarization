@@ -1,7 +1,8 @@
-src/kobart/results.csv
-src/kobart/data/
-src/kobart/checkpoints/
-src/kobart/__pycache__
+src/summarization/results.csv
+src/summarization/data/
+src/summarization/checkpoints/
+src/summary.wav
+__pycache__
 
 # audio clip data
 /data

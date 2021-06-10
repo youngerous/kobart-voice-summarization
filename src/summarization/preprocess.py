@@ -2,11 +2,9 @@ import argparse
 import itertools
 import json
 import os
-from collections import Counter
 from typing import List
 
 import jsonlines
-import torch
 from tqdm import tqdm
 
 from kobart import get_kobart_tokenizer

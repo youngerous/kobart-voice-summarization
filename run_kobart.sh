@@ -1,11 +1,13 @@
 #!/bin/sh
 
+# TODO: ddp 아닐 경우 에러 발생
+
 BATCH_SIZE=4
 EPOCH=5
 LR=5e-5
 ACCUMULATION_STEP=2
 
-N_ENC=6
+N_ENC=3
 N_DEC=3
 
 # run distilBART-6-3

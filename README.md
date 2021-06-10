@@ -96,9 +96,11 @@ sh run_kobart.sh
 # 실행 위치에 따른 경로 수정이 필요할 수 있습니다.
 from inference import get_summarized_text
 
-ckpt = """ 학습된 체크포인트 경로를 입력합니다. """
-text = """ 요약을 수행할 텍스트를 입력합니다. """
-summary = get_summarized_text(ckpt, text)
+ckpt: str = """ 학습된 체크포인트 경로를 입력합니다. """
+text: str = """ 요약을 수행할 텍스트를 입력합니다. """
+n_enc: int = """ DistilKoBART를 사용하는 경우에만 인코더 레이어 개수를 명시해 주면 됩니다. """
+n_dec: int = """ DistilKoBART를 사용하는 경우에만 디코더 레이어 개수를 명시해 주면 됩니다. """
+summary = get_summarized_text(ckpt, text, n_enc, n_dec)
 print(summary)
 ```
 

@@ -1,4 +1,5 @@
-from text import symbols
+from .text.symbols import symbols
+# from text import symbols
 import argparse
 
 defaults = {
