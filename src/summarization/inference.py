@@ -4,7 +4,10 @@ from pprint import pprint
 
 import torch
 from kobart import get_kobart_tokenizer, get_pytorch_kobart_model
-from .distilbart import DistilBART
+try:
+    from .distilbart import DistilBART
+except:
+    from distilbart import DistilBART
 from transformers import BartForConditionalGeneration
 
 MODEL = BartForConditionalGeneration.from_pretrained(get_pytorch_kobart_model())
