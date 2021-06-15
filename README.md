@@ -22,7 +22,7 @@ pip install git+https://github.com/SKT-AI/KoBART#egg=kobart
 ## 3. Code Structure
 ```sh
 # KoBART 문서요약 관련 코드
-src/kobart/
+src/summarization/
     └─ data/
       └─ cached/ # tokenized indice without special tokens
           ├─ cached_train.jsonl
