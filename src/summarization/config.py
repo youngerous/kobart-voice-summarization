@@ -5,9 +5,13 @@ def load_config():
     parser = argparse.ArgumentParser()
 
     # default hparams
-    parser.add_argument("--root-path", type=str, default="src/kobart/data")
-    parser.add_argument("--ckpt-path", type=str, default="src/kobart/checkpoints/")
-    parser.add_argument("--result-path", type=str, default="src/kobart/results.csv")
+    parser.add_argument("--root-path", type=str, default="src/summarization/data")
+    parser.add_argument(
+        "--ckpt-path", type=str, default="src/summarization/checkpoints/"
+    )
+    parser.add_argument(
+        "--result-path", type=str, default="src/summarization/results.csv"
+    )
     parser.add_argument("--seed", type=int, default=42, help="Seed for reproducibility")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--log-step", type=int, default=200)
@@ -36,7 +40,9 @@ def load_config():
 
     # training hparams
     parser.add_argument("--epoch", type=int, default=5)
-    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument(
+        "--batch-size", type=int, default=8, help="It means batch size per gpu in ddp"
+    )
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight-decay", type=float, default=0.01)
     parser.add_argument("--warmup-ratio", type=float, default=0.1)

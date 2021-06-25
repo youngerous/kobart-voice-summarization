@@ -214,6 +214,9 @@ class Trainer:
 
             # update
             loss = loss / self.gradient_accumulation_step
+            if not self.hparams.distributed:
+                loss = loss.sum()
+
             if self.hparams.amp:
                 self.scaler.scale(loss).backward()
                 if (step + 1) % self.gradient_accumulation_step == 0:
