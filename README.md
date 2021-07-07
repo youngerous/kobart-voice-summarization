@@ -71,7 +71,7 @@ src/summarization/
 ### Preprocess
 
 ```train.jsonl``` / ```dev.jsonl``` / ```test.jsonl```은 미리 다운로드받아 위 구조에 맞게 배치해야 합니다. <br>
-```src/kobart/``` 경로에서 아래 명령어를 실행하면 됩니다.
+```src/summarization/``` 경로에서 아래 명령어를 실행하면 됩니다.
 
 ```sh
 # train 
