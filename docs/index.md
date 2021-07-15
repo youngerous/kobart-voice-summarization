@@ -160,29 +160,49 @@
 
 ### *"딱 두 번 해봤을 뿐이긴 하지만, 나는 서핑을 좋아한다."*
 
+<br>
+
+
 - 장기하
   
+
+
 |                                                                            원본                                                                            |                                                                            합성                                                                            |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_syn.wav'></audio> |
 
+
+<br>
+
 - 김탁영
   
+
+
 |                                                                            원본                                                                            |                                                                            합성                                                                            |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_syn.wav'></audio> |
 
+<br>
+
 ### *"그 어떤 스포츠보다도 정확히 삶을 유비해준다고 생각하기 때문이다."*
 
+<br>
 
 - 장기하
   
+
+
 |                                                                             원본                                                                             |                                                                             합성                                                                             |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_syn.wav'></audio> |
 
+
+<br>
+
 - 김탁영
   
+
+
 |                                                                             원본                                                                             |                                                                             합성                                                                             |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_syn.wav'></audio> |
