@@ -115,7 +115,7 @@ print(summary)
 
 ### Demo
 
-요약 모델의 정량적인 평가와 정성적인 결과물은 [데모 페이지](https://youngerous.github.io/kobart-voice-summarization/)에서 확인하실 수 있습니다.
+문서요약 모델, 음역모듈, 그리고 음성합성 모델의 정량/정성적인 결과는 [데모 페이지](https://youngerous.github.io/kobart-voice-summarization/)에서 확인하실 수 있습니다.
 
 ## 7. Members
 [Hyeongwon Kang](https://github.com/hwk0702), [Subin Kim](https://github.com/suubkiim), [Jina Kim](https://github.com/jina-kim7), [Takyoung Kim](https://github.com/youngerous)
