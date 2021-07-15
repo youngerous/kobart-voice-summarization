@@ -150,9 +150,9 @@
 
 ### *"안녕하세요 장기하와 얼굴들의 장기하입니다."*
 
-|                                                                            원본                                                                             |                                                                     합성                                                                     |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
-| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_raw.mp3'></audio> | <audio controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_syn.wav'></audio> |
+|                                                                            원본                                                                             |                                                                            합성                                                                             |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_syn.wav'></audio> |
 
 
 
@@ -162,27 +162,27 @@
 
 - 장기하
   
-|                                원본                                |                                합성                                |
-| :----------------------------------------------------------------: | :----------------------------------------------------------------: |
-| <audio controls><source src='assets/서핑_장기하_원본.mp3'></audio> | <audio controls><source src='assets/서핑_장기하_합성.wav'></audio> |
+|                                                                            원본                                                                            |                                                                            합성                                                                            |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_syn.wav'></audio> |
 
 - 김탁영
   
-|                                원본                                |                                합성                                |
-| :----------------------------------------------------------------: | :----------------------------------------------------------------: |
-| <audio controls><source src='assets/서핑_김탁영_원본.mp3'></audio> | <audio controls><source src='assets/서핑_김탁영_합성.wav'></audio> |
+|                                                                            원본                                                                            |                                                                            합성                                                                            |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_syn.wav'></audio> |
 
 ### *"그 어떤 스포츠보다도 정확히 삶을 유비해준다고 생각하기 때문이다."*
 
 
 - 장기하
   
-|                                 원본                                 |                                 합성                                 |
-| :------------------------------------------------------------------: | :------------------------------------------------------------------: |
-| <audio controls><source src='assets/스포츠_장기하_원본.mp3'></audio> | <audio controls><source src='assets/스포츠_장기하_합성.wav'></audio> |
+|                                                                             원본                                                                             |                                                                             합성                                                                             |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_syn.wav'></audio> |
 
 - 김탁영
   
-|                                 원본                                 |                                 합성                                 |
-| :------------------------------------------------------------------: | :------------------------------------------------------------------: |
-| <audio controls><source src='assets/스포츠_김탁영_원본.m4a'></audio> | <audio controls><source src='assets/스포츠_김탁영_합성.wav'></audio> |
+|                                                                             원본                                                                             |                                                                             합성                                                                             |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_syn.wav'></audio> |
