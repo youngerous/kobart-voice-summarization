@@ -1,6 +1,6 @@
 # Final Demo
 
-가장 좋은 F1-Score 성능을 보인 DistilKoBART-6-3을 사용하였습니다.
+```DistilKoBART-6-3``` showing the best F1 score is used for this demo.
 
 ## Example 1
 
@@ -44,62 +44,62 @@
 
 # Appendix
 
-실제 음성과 합성된 음성을 비교합니다.
+Comparison of the original and synthesized voice.
 
-## 장기하
+## Kiha Chang (장기하; singer)
 
-### *"안녕하세요 장기하와 얼굴들의 장기하입니다."*
+### Prompt: *"안녕하세요 장기하와 얼굴들의 장기하입니다."*
 
-|                                                                            원본                                                                             |                                                                            합성                                                                             |
+|                                                                          Original                                                                           |                                                                         Synthesized                                                                         |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/kia_intro_syn.wav'></audio> |
 
 
 
-## 장기하 및 저자
+## Kiha Chang & Author
 
-### *"딱 두 번 해봤을 뿐이긴 하지만, 나는 서핑을 좋아한다."*
+### Prompt: *"딱 두 번 해봤을 뿐이긴 하지만, 나는 서핑을 좋아한다."*
 
 
-- 장기하
+- Kiha Chang
   
 
 
-|                                                                            원본                                                                            |                                                                            합성                                                                            |
+|                                                                          Original                                                                          |                                                                        Synthesized                                                                         |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_kia_syn.wav'></audio> |
 
 
 <br>
 
-- 저자
+- Author
   
 
 
-|                                                                            원본                                                                            |                                                                            합성                                                                            |
+|                                                                          Original                                                                          |                                                                        Synthesized                                                                         |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/surf_tak_syn.wav'></audio> |
 
 <br>
 
-### *"그 어떤 스포츠보다도 정확히 삶을 유비해준다고 생각하기 때문이다."*
+### Prompt: *"그 어떤 스포츠보다도 정확히 삶을 유비해준다고 생각하기 때문이다."*
 
 
-- 장기하
+- Kiha Chang
   
 
 
-|                                                                             원본                                                                             |                                                                             합성                                                                             |
+|                                                                           Original                                                                           |                                                                         Synthesized                                                                          |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_raw.mp3'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_kia_syn.wav'></audio> |
 
 
 <br>
 
-- 저자
+- Author
   
 
 
-|                                                                             원본                                                                             |                                                                             합성                                                                             |
+|                                                                           Original                                                                           |                                                                         Synthesized                                                                          |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_raw.m4a'></audio> | <audio preload="auto" controls><source src='https://raw.githubusercontent.com/youngerous/kobart-voice-summarization/main/assets/sports_tak_syn.wav'></audio> |
