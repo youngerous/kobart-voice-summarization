@@ -53,7 +53,7 @@ src/summarization/
 
 ### Text Summarization
 
-- Data: Korean abstractive summarization dataset (released by Bflysoft and publicly opened in [AI Hub](https://aihub.or.kr/aidata/8054))
+- Data: Korean abstractive summarization dataset (released by Bflysoft and publicly opened in [AI Hub](https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=97))
   - Train 260,697 / Valid 10,000 / Test 10,000 (partially used)
 - Model: KoBART, DistilKoBART
   - DistilKoBART is a Korean version of DistilBART, which is proposed in [Pre-trained Summarization Distillation (2020)](https://arxiv.org/abs/2010.13002) paper.
