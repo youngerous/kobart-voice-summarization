@@ -55,7 +55,7 @@ src/summarization/
 
 ### Text Summarization
 
-- Data: 한국어 생성요약 뉴스 데이터 일부 (Bflysoft - [AI Hub에 공개](https://aihub.or.kr/aidata/8054))
+- Data: 한국어 생성요약 뉴스 데이터 일부 (Bflysoft - [AI Hub에 공개](https://aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=97))
   - Train 260,697개 / Valid 10,000개 / Test 10,000개
 - Model: KoBART, DistilKoBART
   - DistilKoBART는 huggingface의 [Pre-trained Summarization Distillation(2020)](https://arxiv.org/abs/2010.13002) 논문에서 제안된 방법론으로, Fine-tuning 시 Pre-trained 레이어의 일부만을 사용하는 모델입니다.
